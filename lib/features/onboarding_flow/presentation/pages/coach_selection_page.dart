@@ -29,7 +29,7 @@ class CoachSelectionPage extends ConsumerWidget {
             SizedBox(height: 28.h),
             _buildCoachCards(ref, selectedId),
             SizedBox(height: 24.h),
-            _buildPaginationDots(selectedId),
+            _buildPaginationDots(),
             SizedBox(height: 32.h),
             _buildActions(context),
             SizedBox(height: 32.h),
@@ -117,12 +117,11 @@ class CoachSelectionPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildPaginationDots(CoachId selectedId) {
-    final activeIndex = coaches.indexWhere((c) => c.id == selectedId);
+  Widget _buildPaginationDots() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(7, (index) {
-        final isActive = index == activeIndex;
+        final isActive = index == 0;
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 3.w),
           child: AnimatedContainer(
