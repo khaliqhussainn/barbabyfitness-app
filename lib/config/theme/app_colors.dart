@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
 
-// All values are temporary placeholders pending Figma design handoff.
-// Do not derive brand identity from these values.
 abstract final class AppColors {
-  // Light theme
-  static const Color primary = Color(0xFF000000);
+  // Brand
+  static const Color primary = Color(0xFFF97316);
   static const Color onPrimary = Color(0xFFFFFFFF);
-  static const Color secondary = Color(0xFF000000);
-  static const Color onSecondary = Color(0xFFFFFFFF);
-  static const Color surface = Color(0xFFFFFFFF);
-  static const Color onSurface = Color(0xFF000000);
-  static const Color error = Color(0xFFB00020);
-  static const Color onError = Color(0xFFFFFFFF);
 
-  // Dark theme
-  static const Color primaryDark = Color(0xFFFFFFFF);
-  static const Color onPrimaryDark = Color(0xFF000000);
-  static const Color secondaryDark = Color(0xFFFFFFFF);
-  static const Color onSecondaryDark = Color(0xFF000000);
-  static const Color surfaceDark = Color(0xFF121212);
-  static const Color onSurfaceDark = Color(0xFFFFFFFF);
-  static const Color errorDark = Color(0xFFCF6679);
-  static const Color onErrorDark = Color(0xFF000000);
+  // Background & Surface
+  static const Color background = Color(0xFF0D0D0D);
+  static const Color surface = Color(0xFF1C1C1E);
+  static const Color onSurface = Color(0xFFFFFFFF);
+
+  // Text
+  static const Color textPrimary = Color(0xFFFFFFFF);
+  static const Color textSecondary = Color(0xFF8E8E93);
+
+  // Input fields
+  static const Color inputBorder = Color(0xFF3A3A3C);
+  static const Color inputFill = Color(0xFF1C1C1E);
+  static const Color inputHint = Color(0xFF636366);
+
+  // Utility
+  static const Color divider = Color(0xFF2D2D2D);
+  static const Color error = Color(0xFFEF4444);
+  static const Color onError = Color(0xFFFFFFFF);
 }

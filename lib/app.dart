@@ -25,7 +25,7 @@ class App extends ConsumerWidget {
         title: AppConstants.appName,
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
-        themeMode: ThemeMode.system,
+        themeMode: ThemeMode.dark,
         routerConfig: router,
         debugShowCheckedModeBanner: false,
       ),

@@ -190,8 +190,8 @@ barbabyfitness-app/
 ## Theme Strategy
 
 - **Material 3** is enabled (`useMaterial3: true`)
-- **ThemeMode:** Follows system setting (`ThemeMode.system`)
-- **AppColors:** Placeholder values only — all brand colors come from Figma
+- **ThemeMode:** `ThemeMode.dark` — all Figma screens are dark; light theme pending design
+- **AppColors:** Brand colors extracted from Figma (updated 2026-06-30)
 - **AppTypography:** Inter (via `google_fonts`) as placeholder — final font from Figma
 - **AppTheme:** Exposes `static final ThemeData light` and `dark`
 - **Design dimensions:** 390×844 (iPhone 14 base) — update `ResponsiveConfig` when Figma frames are confirmed
@@ -281,6 +281,56 @@ The following features are expected but not started. Each will follow the full C
 ---
 
 ## Changelog
+
+### 2026-06-30 — Splash & Onboarding Screens
+
+**Screen Implemented:** Splash Screen + Onboarding Screen
+
+**Splash Screen**
+- Purpose: App entry point; displays brand logo for 2 seconds then navigates to Onboarding
+- Navigation: Auto-navigates to `/onboarding` after `Duration(seconds: 2)` via `context.go`
+- Components: `_RingLogoPainter` (CustomPainter — two concentric orange arcs, local to page)
+- Backend Hooks: None. In future, replace timer with async auth check (if user is logged in, skip to home)
+
+**Onboarding Screen**
+- Purpose: First-run user entry point; introduces the app value proposition
+- Navigation: "Get Started" → `/signup` · "Log In" → `/login`
+- Components:
+  - `AppPrimaryButton` (extracted to `shared/widgets/` — reused across all auth screens)
+  - `_OutlineButton` (local to OnboardingPage — appears on this screen only)
+  - `_GridPainter` (CustomPainter — subtle white grid overlay on dark background, local to page)
+- Backend Hooks: None at this stage. "Get Started" and "Log In" routes will eventually carry auth context
+
+**Files Added**
+- `lib/shared/widgets/app_primary_button.dart` — reusable orange pill button
+- `lib/features/splash/presentation/pages/splash_page.dart` — implemented (was stub)
+- `lib/features/onboarding/presentation/pages/onboarding_page.dart` — implemented (was stub)
+
+**Files Modified**
+- `lib/config/theme/app_colors.dart` — replaced placeholders with Figma brand colors
+- `lib/config/theme/app_theme.dart` — applied brand colors to dark theme; dark theme is now primary
+- `lib/app.dart` — changed `ThemeMode.system` → `ThemeMode.dark`
+- `docs/PROJECT_SPEC.md` — appended screen log
+
+**Architectural Decisions**
+- `ThemeMode.dark` hardcoded — all 5 Figma screens are dark-only; light mode is deferred
+- `AppPrimaryButton` extracted immediately — confirmed present on 4 of 5 auth screens
+- `_GridPainter` and `_RingLogoPainter` kept local (private classes) — not reused elsewhere
+- Splash uses `StatefulWidget` for `initState` timer; navigation in `mounted` guard prevents leaks
+- No Riverpod providers needed at this stage for these screens — added when auth state drives navigation
+
+**Brand Colors (from Figma)**
+| Token | Value |
+|-------|-------|
+| background | `#0D0D0D` |
+| primary | `#F97316` |
+| textPrimary | `#FFFFFF` |
+| textSecondary | `#8E8E93` |
+| surface | `#1C1C1E` |
+| inputBorder | `#3A3A3C` |
+| error | `#EF4444` |
+
+---
 
 ### 2026-06-30 — Foundation
 
