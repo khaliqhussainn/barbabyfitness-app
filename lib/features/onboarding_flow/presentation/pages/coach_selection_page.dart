@@ -146,7 +146,7 @@ class CoachSelectionPage extends ConsumerWidget {
         children: [
           AppPrimaryButton(
             label: 'Confirm Guide',
-            onPressed: () => context.go(RouteNames.home),
+            onPressed: () => context.go(RouteNames.voiceSelection),
           ),
           SizedBox(height: 16.h),
           GestureDetector(

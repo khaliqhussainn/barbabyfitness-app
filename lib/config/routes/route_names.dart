@@ -19,4 +19,7 @@ abstract final class RouteNames {
 
   static const String coachSelection = '/onboarding-flow/coach-selection';
   static const String coachSelectionName = 'coach-selection';
+
+  static const String voiceSelection = '/onboarding-flow/voice-selection';
+  static const String voiceSelectionName = 'voice-selection';
 }
