@@ -218,7 +218,7 @@ class _RadioCircle extends StatelessWidget {
         shape: BoxShape.circle,
         color: isSelected ? AppColors.primary : Colors.transparent,
         border: Border.all(
-          color: isSelected ? AppColors.primary : const Color(0xFF262626),
+          color: isSelected ? AppColors.primary : AppColors.inputBorder,
           width: 2,
         ),
       ),
