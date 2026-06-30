@@ -204,7 +204,7 @@ class _CoachCard extends StatelessWidget {
             coach.title,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: isSelected ? AppColors.primary : AppColors.textSecondary,
+              color: AppColors.textPrimary,
               fontSize: 16.sp,
               fontWeight: FontWeight.w600,
             ),
@@ -227,9 +227,9 @@ class _CoachCard extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: AppColors.textSecondary,
-                fontSize: 12.sp,
+                fontSize: 10.sp,
                 fontWeight: FontWeight.w400,
-                height: 1.5,
+                height: 1.2,
               ),
             ),
           ),
