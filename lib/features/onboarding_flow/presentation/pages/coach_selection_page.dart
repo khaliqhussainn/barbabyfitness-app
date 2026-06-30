@@ -28,7 +28,7 @@ class CoachSelectionPage extends ConsumerWidget {
             _buildHeader(),
             SizedBox(height: 28.h),
             _buildCoachCards(ref, selectedId),
-            SizedBox(height: 28.h),
+            SizedBox(height: 24.h),
             _buildPaginationDots(),
             SizedBox(height: 32.h),
             _buildActions(context),
@@ -41,7 +41,7 @@ class CoachSelectionPage extends ConsumerWidget {
 
   Widget _buildTopBar(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Align(
         alignment: Alignment.centerLeft,
         child: GestureDetector(
@@ -97,12 +97,12 @@ class CoachSelectionPage extends ConsumerWidget {
 
   Widget _buildCoachCards(WidgetRef ref, CoachId selectedId) {
     return SizedBox(
-      height: 300.h,
+      height: 346.h,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(horizontal: 20.w),
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
         itemCount: coaches.length,
-        separatorBuilder: (_, __) => SizedBox(width: 14.w),
+        separatorBuilder: (_, __) => SizedBox(width: 8.w),
         itemBuilder: (context, index) {
           final coach = coaches[index];
           final isSelected = coach.id == selectedId;
@@ -126,8 +126,8 @@ class CoachSelectionPage extends ConsumerWidget {
           padding: EdgeInsets.symmetric(horizontal: 3.w),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            width: isActive ? 22.w : 8.w,
-            height: 8.w,
+            width: isActive ? 52.w : 24.w,
+            height: 24.h,
             decoration: BoxDecoration(
               color: isActive ? AppColors.primary : AppColors.surface,
               borderRadius: BorderRadius.circular(100.r),
@@ -184,7 +184,8 @@ class _CoachCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      width: 200.w,
+      width: 118.w,
+      height: 346.h,
       decoration: BoxDecoration(
         color: isSelected
             ? AppColors.primary.withValues(alpha: 0.08)
@@ -195,7 +196,7 @@ class _CoachCard extends StatelessWidget {
           width: 1.5,
         ),
       ),
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 16.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -204,20 +205,19 @@ class _CoachCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: isSelected ? AppColors.primary : AppColors.textSecondary,
-              fontSize: 12.sp,
+              fontSize: 16.sp,
               fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
             ),
           ),
           SizedBox(height: 14.h),
           _AvatarPlaceholder(isSelected: isSelected),
-          SizedBox(height: 12.h),
+          SizedBox(height: 10.h),
           Text(
             coach.name,
             style: TextStyle(
               color: AppColors.textPrimary,
-              fontSize: 18.sp,
-              fontWeight: FontWeight.w700,
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
             ),
           ),
           SizedBox(height: 8.h),
@@ -227,13 +227,13 @@ class _CoachCard extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: AppColors.textSecondary,
-                fontSize: 11.sp,
+                fontSize: 12.sp,
                 fontWeight: FontWeight.w400,
                 height: 1.5,
               ),
             ),
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: 10.h),
           _SelectButton(isSelected: isSelected, onTap: onSelect),
         ],
       ),
@@ -249,8 +249,8 @@ class _AvatarPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 72.w,
-      height: 72.w,
+      width: 86.w,
+      height: 86.w,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: isSelected
@@ -264,7 +264,7 @@ class _AvatarPlaceholder extends StatelessWidget {
       child: Icon(
         Icons.person_outline_rounded,
         color: isSelected ? AppColors.primary : AppColors.textSecondary,
-        size: 32.w,
+        size: 36.w,
       ),
     );
   }
@@ -282,7 +282,8 @@ class _SelectButton extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        height: 36.h,
+        width: 86.w,
+        height: 24.h,
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(100.r),
@@ -295,9 +296,8 @@ class _SelectButton extends StatelessWidget {
         child: Text(
           isSelected ? 'Selected' : 'Select',
           style: TextStyle(
-            color:
-                isSelected ? AppColors.onPrimary : AppColors.textSecondary,
-            fontSize: 13.sp,
+            color: isSelected ? AppColors.onPrimary : AppColors.textSecondary,
+            fontSize: 12.sp,
             fontWeight: FontWeight.w600,
           ),
         ),
