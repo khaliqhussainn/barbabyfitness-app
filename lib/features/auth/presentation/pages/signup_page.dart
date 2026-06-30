@@ -40,13 +40,14 @@ class _SignupPageState extends State<SignupPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              SizedBox(height: 48.h),
+              // Blank space above — matches Figma layout
+              SizedBox(height: 160.h),
               _buildTitle(),
-              SizedBox(height: 28.h),
-              _buildForm(context),
-              SizedBox(height: 16.h),
+              SizedBox(height: 24.h),
+              _buildCard(context),
+              SizedBox(height: 20.h),
               _buildFooter(context),
-              SizedBox(height: 32.h),
+              SizedBox(height: 40.h),
             ],
           ),
         ),
@@ -55,66 +56,76 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   Widget _buildTitle() {
-    return Text(
-      'Create Account',
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        color: AppColors.textPrimary,
-        fontSize: 28.sp,
-        fontWeight: FontWeight.w800,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
+      child: Text(
+        'Create Account',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: AppColors.textPrimary,
+          fontSize: 32.sp,
+          fontWeight: FontWeight.w800,
+        ),
       ),
     );
   }
 
-  Widget _buildForm(BuildContext context) {
+  Widget _buildCard(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          AppTextField(
-            hintText: 'Name',
-            prefixIcon: Icons.person_outline,
-            controller: _nameController,
-            keyboardType: TextInputType.name,
-            textInputAction: TextInputAction.next,
-          ),
-          SizedBox(height: 14.h),
-          AppTextField(
-            hintText: 'Email',
-            prefixIcon: Icons.alternate_email,
-            controller: _emailController,
-            keyboardType: TextInputType.emailAddress,
-            textInputAction: TextInputAction.next,
-          ),
-          SizedBox(height: 14.h),
-          AppTextField(
-            hintText: 'Password',
-            prefixIcon: Icons.key_outlined,
-            controller: _passwordController,
-            obscureText: true,
-            textInputAction: TextInputAction.next,
-          ),
-          SizedBox(height: 14.h),
-          AppTextField(
-            hintText: 'Confirm Password',
-            prefixIcon: Icons.key_outlined,
-            controller: _confirmPasswordController,
-            obscureText: true,
-            textInputAction: TextInputAction.done,
-          ),
-          SizedBox(height: 16.h),
-          _buildTermsRow(),
-          SizedBox(height: 24.h),
-          AppPrimaryButton(
-            label: 'Sign Up',
-            onPressed: _agreedToTerms ? () {} : null,
-          ),
-          SizedBox(height: 24.h),
-          const OrDivider(),
-          SizedBox(height: 24.h),
-          const SocialLoginRow(),
-        ],
+      child: Container(
+        padding: EdgeInsets.all(20.w),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AppTextField(
+              hintText: 'Name',
+              prefixIcon: Icons.person_outline,
+              controller: _nameController,
+              keyboardType: TextInputType.name,
+              textInputAction: TextInputAction.next,
+            ),
+            SizedBox(height: 14.h),
+            AppTextField(
+              hintText: 'Email',
+              prefixIcon: Icons.alternate_email,
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
+            ),
+            SizedBox(height: 14.h),
+            AppTextField(
+              hintText: 'Password',
+              prefixIcon: Icons.key_outlined,
+              controller: _passwordController,
+              obscureText: true,
+              textInputAction: TextInputAction.next,
+            ),
+            SizedBox(height: 14.h),
+            AppTextField(
+              hintText: 'Confirm Password',
+              prefixIcon: Icons.key_outlined,
+              controller: _confirmPasswordController,
+              obscureText: true,
+              textInputAction: TextInputAction.done,
+            ),
+            SizedBox(height: 16.h),
+            _buildTermsRow(),
+            SizedBox(height: 24.h),
+            AppPrimaryButton(
+              label: 'Sign Up',
+              onPressed: _agreedToTerms ? () {} : null,
+            ),
+            SizedBox(height: 24.h),
+            const OrDivider(),
+            SizedBox(height: 24.h),
+            const SocialLoginRow(),
+          ],
+        ),
       ),
     );
   }
@@ -144,7 +155,7 @@ class _SignupPageState extends State<SignupPage> {
           text: TextSpan(
             style: TextStyle(fontSize: 13.sp),
             children: [
-              TextSpan(
+              const TextSpan(
                 text: 'I Agree to ',
                 style: TextStyle(color: AppColors.textSecondary),
               ),
@@ -177,7 +188,7 @@ class _SignupPageState extends State<SignupPage> {
         text: TextSpan(
           style: TextStyle(fontSize: 14.sp),
           children: [
-            TextSpan(
+            const TextSpan(
               text: 'Already have an account? ',
               style: TextStyle(color: AppColors.textSecondary),
             ),

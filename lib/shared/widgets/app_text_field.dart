@@ -24,7 +24,7 @@ class AppTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final border = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10.r),
+      borderRadius: BorderRadius.circular(100.r),
       borderSide: const BorderSide(color: AppColors.inputBorder),
     );
 
@@ -53,10 +53,10 @@ class AppTextField extends StatelessWidget {
         border: border,
         enabledBorder: border,
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
+          borderRadius: BorderRadius.circular(100.r),
           borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
-        contentPadding: EdgeInsets.symmetric(vertical: 16.h),
+        contentPadding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 20.w),
       ),
     );
   }

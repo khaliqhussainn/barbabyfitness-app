@@ -35,15 +35,16 @@ class _LoginPageState extends State<LoginPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              SizedBox(height: 60.h),
+              // Blank space above — matches Figma layout
+              SizedBox(height: 240.h),
               _buildTitle(),
               SizedBox(height: 28.h),
               _buildCard(context),
-              SizedBox(height: 24.h),
+              SizedBox(height: 28.h),
               _buildContinueWithoutLogin(context),
               SizedBox(height: 16.h),
               _buildFooter(context),
-              SizedBox(height: 32.h),
+              SizedBox(height: 40.h),
             ],
           ),
         ),
@@ -52,13 +53,16 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildTitle() {
-    return Text(
-      'Sign In to your Profile',
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        color: AppColors.textPrimary,
-        fontSize: 20.sp,
-        fontWeight: FontWeight.w700,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
+      child: Text(
+        'Sign In to your Profile',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: AppColors.textPrimary,
+          fontSize: 20.sp,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
@@ -70,7 +74,7 @@ class _LoginPageState extends State<LoginPage> {
         padding: EdgeInsets.all(20.w),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16.r),
+          borderRadius: BorderRadius.circular(20.r),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -90,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
               obscureText: true,
               textInputAction: TextInputAction.done,
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 10.h),
             Align(
               alignment: Alignment.centerRight,
               child: GestureDetector(
@@ -125,6 +129,7 @@ class _LoginPageState extends State<LoginPage> {
       onTap: () => context.go(RouteNames.home),
       child: Text(
         'Continue without login',
+        textAlign: TextAlign.center,
         style: TextStyle(
           color: AppColors.textPrimary,
           fontSize: 14.sp,
@@ -146,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             TextSpan(
               text: "Don't have any account? ",
-              style: TextStyle(color: AppColors.textSecondary),
+              style: const TextStyle(color: AppColors.textSecondary),
             ),
             TextSpan(
               text: 'Create Account',
