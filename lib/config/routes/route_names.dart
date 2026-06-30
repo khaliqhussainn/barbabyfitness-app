@@ -16,4 +16,7 @@ abstract final class RouteNames {
 
   static const String home = '/home';
   static const String homeName = 'home';
+
+  static const String coachSelection = '/onboarding-flow/coach-selection';
+  static const String coachSelectionName = 'coach-selection';
 }

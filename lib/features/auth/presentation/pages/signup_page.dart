@@ -118,7 +118,9 @@ class _SignupPageState extends State<SignupPage> {
             SizedBox(height: 24.h),
             AppPrimaryButton(
               label: 'Sign Up',
-              onPressed: _agreedToTerms ? () {} : null,
+              onPressed: _agreedToTerms
+                  ? () => context.go(RouteNames.coachSelection)
+                  : null,
             ),
             SizedBox(height: 24.h),
             const OrDivider(),
