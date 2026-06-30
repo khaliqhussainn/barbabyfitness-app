@@ -1,0 +1,52 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../features/auth/presentation/pages/forgot_password_page.dart';
+import '../../features/auth/presentation/pages/login_page.dart';
+import '../../features/auth/presentation/pages/signup_page.dart';
+import '../../features/home/presentation/pages/home_page.dart';
+import '../../features/onboarding/presentation/pages/onboarding_page.dart';
+import '../../features/splash/presentation/pages/splash_page.dart';
+import '../../shared/pages/unknown_page.dart';
+import 'route_names.dart';
+
+final goRouterProvider = Provider<GoRouter>((ref) {
+  return GoRouter(
+    debugLogDiagnostics: kDebugMode,
+    initialLocation: RouteNames.splash,
+    errorBuilder: (context, state) => const UnknownPage(),
+    routes: [
+      GoRoute(
+        path: RouteNames.splash,
+        name: RouteNames.splashName,
+        builder: (context, state) => const SplashPage(),
+      ),
+      GoRoute(
+        path: RouteNames.onboarding,
+        name: RouteNames.onboardingName,
+        builder: (context, state) => const OnboardingPage(),
+      ),
+      GoRoute(
+        path: RouteNames.login,
+        name: RouteNames.loginName,
+        builder: (context, state) => const LoginPage(),
+      ),
+      GoRoute(
+        path: RouteNames.signup,
+        name: RouteNames.signupName,
+        builder: (context, state) => const SignupPage(),
+      ),
+      GoRoute(
+        path: RouteNames.forgotPassword,
+        name: RouteNames.forgotPasswordName,
+        builder: (context, state) => const ForgotPasswordPage(),
+      ),
+      GoRoute(
+        path: RouteNames.home,
+        name: RouteNames.homeName,
+        builder: (context, state) => const HomePage(),
+      ),
+    ],
+  );
+});
