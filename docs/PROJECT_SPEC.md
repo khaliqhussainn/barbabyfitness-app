@@ -282,6 +282,49 @@ The following features are expected but not started. Each will follow the full C
 
 ## Changelog
 
+### 2026-06-30 — Login & Signup Screens
+
+**Screens Implemented:** Login, Signup
+
+**Login Screen**
+- Purpose: Existing user authentication entry point
+- Navigation: "Sign In" → (auth provider, wired later) · "Forgot Password?" → `/forgot-password` · "Create Account" → `/signup` · "Continue without login" → `/home`
+- Layout: Title above surface-color card; card holds all form elements and social row
+- Components: `AppTextField` (email, password), `AppPrimaryButton` (Sign In), `OrDivider`, `SocialLoginRow` — all from shared/widgets
+- Local: `_buildCard`, `_buildContinueWithoutLogin`, `_buildFooter` (private helpers)
+- Backend Hooks: `AppPrimaryButton.onPressed` — wire to auth provider when login usecase is ready
+
+**Signup Screen**
+- Purpose: New user registration
+- Navigation: "Sign Up" → (auth provider, wired later) · "Sign In" → `/login` · "Terms and Conditions" → (terms screen, future)
+- Layout: Large bold title, input fields directly on background (no card), terms checkbox, social row
+- Components: `AppTextField` (name, email, password, confirm password), `AppPrimaryButton` (Sign Up — disabled until terms accepted), `OrDivider`, `SocialLoginRow`
+- Local: `_buildTitle`, `_buildForm`, `_buildTermsRow`, `_buildFooter`
+- Backend Hooks: `AppPrimaryButton.onPressed` — wire to auth provider when signup usecase is ready
+
+**Files Added**
+- `lib/shared/widgets/app_text_field.dart` — generic text input with prefix icon, obscureText, keyboard/action type
+- `lib/shared/widgets/or_divider.dart` — "OR" text flanked by divider lines
+- `lib/shared/widgets/social_login_row.dart` — Google, Apple, Meta SVG buttons in a row
+
+**Files Modified**
+- `lib/features/auth/presentation/pages/login_page.dart` — full implementation (was stub)
+- `lib/features/auth/presentation/pages/signup_page.dart` — full implementation (was stub)
+- `docs/PROJECT_SPEC.md` — appended
+
+**Assets Used**
+- `assets/images/google.svg`, `apple.svg`, `meta.svg` — social login icons (48×48, circular gray bg, white logos)
+
+**Architectural Decisions**
+- `AppTextField` handles both text and password (via `obscureText` param) — avoids a separate `AppPasswordField` class since the visuals are identical
+- Signup page disables "Sign Up" button when `_agreedToTerms` is false — enforces acceptance before submission
+- `SocialLoginRow` callbacks are `() {}` stubs — wired to auth providers when OAuth is implemented
+- `LoginPage` and `SignupPage` are `StatefulWidget` to own `TextEditingController` lifecycles; controllers move to Riverpod providers when auth state management is added
+- Login uses a card (`AppColors.surface`) to visually group form elements, matching Figma. Signup has no card — fields sit directly on background per Figma
+- `WidgetSpan` used for "Terms and Conditions" tap target inside `RichText` for proper hit-test area
+
+---
+
 ### 2026-06-30 — Splash & Onboarding Screens
 
 **Screen Implemented:** Splash Screen + Onboarding Screen
