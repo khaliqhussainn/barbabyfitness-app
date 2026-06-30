@@ -5,9 +5,9 @@ import '../../config/theme/app_colors.dart';
 
 class AppPrimaryButton extends StatelessWidget {
   const AppPrimaryButton({
-    super.key,
     required this.label,
     required this.onPressed,
+    super.key,
     this.isLoading = false,
   });
 

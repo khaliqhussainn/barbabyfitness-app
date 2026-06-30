@@ -7,7 +7,6 @@ abstract final class AppTheme {
   // The app is dark-themed. Light theme pending Figma design.
   static final ThemeData dark = ThemeData(
     useMaterial3: true,
-    brightness: Brightness.dark,
     scaffoldBackgroundColor: AppColors.background,
     colorScheme: const ColorScheme.dark(
       primary: AppColors.primary,
