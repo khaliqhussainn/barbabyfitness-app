@@ -25,4 +25,7 @@ abstract final class RouteNames {
 
   static const String fitnessLevel = '/onboarding-flow/fitness-level';
   static const String fitnessLevelName = 'fitness-level';
+
+  static const String mainGoal = '/onboarding-flow/main-goal';
+  static const String mainGoalName = 'main-goal';
 }
