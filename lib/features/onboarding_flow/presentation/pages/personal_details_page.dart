@@ -26,11 +26,9 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
   void initState() {
     super.initState();
     final details = ref.read(personalDetailsProvider);
-    _ageController = TextEditingController(text: details.age.toString());
-    _heightController =
-        TextEditingController(text: details.height.toString());
-    _weightController =
-        TextEditingController(text: details.weight.toString());
+    _ageController = TextEditingController();
+    _heightController = TextEditingController();
+    _weightController = TextEditingController();
   }
 
   @override
@@ -157,10 +155,10 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
           border: InputBorder.none,
           isDense: true,
           contentPadding: EdgeInsets.zero,
-          hintText: 'Enter age',
+          hintText: 'Enter your age',
           hintStyle: TextStyle(
-            color: AppColors.inputHint,
-            fontSize: 21.sp,
+            color: AppColors.inputHint.withValues(alpha: 0.5),
+            fontSize: 13.sp,
             fontWeight: FontWeight.w400,
           ),
         ),
@@ -214,10 +212,10 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
-                hintText: 'Enter height',
+                hintText: 'Enter your height',
                 hintStyle: TextStyle(
-                  color: AppColors.inputHint,
-                  fontSize: 21.sp,
+                  color: AppColors.inputHint.withValues(alpha: 0.5),
+                  fontSize: 13.sp,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -260,10 +258,10 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
-                hintText: 'Enter weight',
+                hintText: 'Enter your weight',
                 hintStyle: TextStyle(
-                  color: AppColors.inputHint,
-                  fontSize: 21.sp,
+                  color: AppColors.inputHint.withValues(alpha: 0.5),
+                  fontSize: 13.sp,
                   fontWeight: FontWeight.w400,
                 ),
               ),
