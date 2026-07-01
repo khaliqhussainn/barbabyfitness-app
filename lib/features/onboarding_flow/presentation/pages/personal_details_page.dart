@@ -153,10 +153,16 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
           fontSize: 24.sp,
           fontWeight: FontWeight.w400,
         ),
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           border: InputBorder.none,
           isDense: true,
           contentPadding: EdgeInsets.zero,
+          hintText: 'Enter age',
+          hintStyle: TextStyle(
+            color: AppColors.inputHint,
+            fontSize: 24.sp,
+            fontWeight: FontWeight.w400,
+          ),
         ),
       ),
     );
@@ -204,10 +210,16 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
                 fontSize: 24.sp,
                 fontWeight: FontWeight.w400,
               ),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
+                hintText: 'Enter height',
+                hintStyle: TextStyle(
+                  color: AppColors.inputHint,
+                  fontSize: 24.sp,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
             ),
           ),
@@ -244,10 +256,16 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
                 fontSize: 24.sp,
                 fontWeight: FontWeight.w400,
               ),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
+                hintText: 'Enter weight',
+                hintStyle: TextStyle(
+                  color: AppColors.inputHint,
+                  fontSize: 24.sp,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
             ),
           ),
@@ -307,7 +325,7 @@ class _DetailCard extends StatelessWidget {
     return Container(
       width: 354.w,
       height: 96.h,
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(20.r),
