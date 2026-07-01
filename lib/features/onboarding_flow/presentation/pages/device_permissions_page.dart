@@ -178,7 +178,7 @@ class _PermissionCard extends StatelessWidget {
           Icon(
             icon,
             color: AppColors.primary,
-            size: 36.w,
+            size: 33.w,
           ),
           SizedBox(width: 14.w),
           Expanded(
@@ -190,7 +190,7 @@ class _PermissionCard extends StatelessWidget {
                   title,
                   style: TextStyle(
                     color: AppColors.textPrimary,
-                    fontSize: 20.sp,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -199,7 +199,7 @@ class _PermissionCard extends StatelessWidget {
                   subtitle,
                   style: TextStyle(
                     color: AppColors.textSecondary,
-                    fontSize: 16.sp,
+                    fontSize: 13.sp,
                     fontWeight: FontWeight.w400,
                   ),
                 ),

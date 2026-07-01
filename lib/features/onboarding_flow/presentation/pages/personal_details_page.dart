@@ -150,7 +150,7 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
         },
         style: TextStyle(
           color: AppColors.textPrimary,
-          fontSize: 24.sp,
+          fontSize: 21.sp,
           fontWeight: FontWeight.w400,
         ),
         decoration: InputDecoration(
@@ -160,7 +160,7 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
           hintText: 'Enter age',
           hintStyle: TextStyle(
             color: AppColors.inputHint,
-            fontSize: 24.sp,
+            fontSize: 21.sp,
             fontWeight: FontWeight.w400,
           ),
         ),
@@ -207,7 +207,7 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
               },
               style: TextStyle(
                 color: AppColors.textPrimary,
-                fontSize: 24.sp,
+                fontSize: 21.sp,
                 fontWeight: FontWeight.w400,
               ),
               decoration: InputDecoration(
@@ -217,7 +217,7 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
                 hintText: 'Enter height',
                 hintStyle: TextStyle(
                   color: AppColors.inputHint,
-                  fontSize: 24.sp,
+                  fontSize: 21.sp,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -253,7 +253,7 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
               },
               style: TextStyle(
                 color: AppColors.textPrimary,
-                fontSize: 24.sp,
+                fontSize: 21.sp,
                 fontWeight: FontWeight.w400,
               ),
               decoration: InputDecoration(
@@ -263,7 +263,7 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
                 hintText: 'Enter weight',
                 hintStyle: TextStyle(
                   color: AppColors.inputHint,
-                  fontSize: 24.sp,
+                  fontSize: 21.sp,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -338,7 +338,7 @@ class _DetailCard extends StatelessWidget {
             label,
             style: TextStyle(
               color: AppColors.primary,
-              fontSize: 16.sp,
+              fontSize: 13.sp,
               fontWeight: FontWeight.w400,
             ),
           ),
@@ -378,7 +378,7 @@ class _GenderButton extends StatelessWidget {
           label,
           style: TextStyle(
             color: AppColors.textPrimary,
-            fontSize: 16.sp,
+            fontSize: 13.sp,
             fontWeight: FontWeight.w600,
           ),
         ),
