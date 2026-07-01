@@ -140,7 +140,7 @@ class MainGoalPage extends ConsumerWidget {
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: AppPrimaryButton(
         label: 'Confirm Goal',
-        onPressed: () => context.go(RouteNames.home),
+        onPressed: () => context.go(RouteNames.personalDetails),
       ),
     );
   }

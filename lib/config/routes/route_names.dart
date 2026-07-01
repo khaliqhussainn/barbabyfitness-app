@@ -28,4 +28,7 @@ abstract final class RouteNames {
 
   static const String mainGoal = '/onboarding-flow/main-goal';
   static const String mainGoalName = 'main-goal';
+
+  static const String personalDetails = '/onboarding-flow/personal-details';
+  static const String personalDetailsName = 'personal-details';
 }
