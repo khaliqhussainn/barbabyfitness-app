@@ -6,6 +6,7 @@ import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/onboarding_flow/presentation/pages/coach_selection_page.dart';
 import '../../features/onboarding_flow/presentation/pages/fitness_level_page.dart';
 import '../../features/onboarding_flow/presentation/pages/main_goal_page.dart';
+import '../../features/onboarding_flow/presentation/pages/device_permissions_page.dart';
 import '../../features/onboarding_flow/presentation/pages/personal_details_page.dart';
 import '../../features/onboarding_flow/presentation/pages/voice_selection_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
@@ -76,6 +77,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.personalDetails,
         name: RouteNames.personalDetailsName,
         builder: (context, state) => const PersonalDetailsPage(),
+      ),
+      GoRoute(
+        path: RouteNames.devicePermissions,
+        name: RouteNames.devicePermissionsName,
+        builder: (context, state) => const DevicePermissionsPage(),
       ),
     ],
   );

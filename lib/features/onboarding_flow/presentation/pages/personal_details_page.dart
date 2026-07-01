@@ -308,7 +308,7 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: AppPrimaryButton(
         label: 'Confirm Details',
-        onPressed: () => context.go(RouteNames.home),
+        onPressed: () => context.go(RouteNames.devicePermissions),
       ),
     );
   }

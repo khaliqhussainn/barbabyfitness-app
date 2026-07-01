@@ -31,4 +31,7 @@ abstract final class RouteNames {
 
   static const String personalDetails = '/onboarding-flow/personal-details';
   static const String personalDetailsName = 'personal-details';
+
+  static const String devicePermissions = '/onboarding-flow/device-permissions';
+  static const String devicePermissionsName = 'device-permissions';
 }
