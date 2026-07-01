@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../config/routes/route_names.dart';
@@ -104,11 +105,10 @@ class CalibrationWorkoutPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Watch SVG placeholder — swap with SvgPicture.asset once file is pushed
-          Icon(
-            Icons.watch_outlined,
-            color: AppColors.textSecondary,
-            size: 80.w,
+          SvgPicture.asset(
+            'assets/images/watch.svg',
+            width: 48.w,
+            height: 88.h,
           ),
           SizedBox(height: 24.h),
           Text(
