@@ -142,7 +142,7 @@ class DevicePermissionsPage extends ConsumerWidget {
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: AppPrimaryButton(
         label: 'Allow & Continue',
-        onPressed: () => context.go(RouteNames.home),
+        onPressed: () => context.go(RouteNames.calibrationWorkout),
       ),
     );
   }

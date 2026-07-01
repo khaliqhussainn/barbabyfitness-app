@@ -34,4 +34,7 @@ abstract final class RouteNames {
 
   static const String devicePermissions = '/onboarding-flow/device-permissions';
   static const String devicePermissionsName = 'device-permissions';
+
+  static const String calibrationWorkout = '/onboarding-flow/calibration-workout';
+  static const String calibrationWorkoutName = 'calibration-workout';
 }
