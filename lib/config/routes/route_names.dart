@@ -37,4 +37,7 @@ abstract final class RouteNames {
 
   static const String calibrationWorkout = '/onboarding-flow/calibration-workout';
   static const String calibrationWorkoutName = 'calibration-workout';
+
+  static const String workoutSelection = '/workouts';
+  static const String workoutSelectionName = 'workout-selection';
 }

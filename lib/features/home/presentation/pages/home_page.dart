@@ -3,16 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../config/theme/app_colors.dart';
+import '../../../../shared/widgets/app_bottom_nav.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +37,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomNav(),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 0),
     );
   }
 
@@ -408,56 +402,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildBottomNav() {
-    final items = [
-      (Icons.home_rounded, 'Home'),
-      (Icons.fitness_center_rounded, 'Workouts'),
-      (Icons.bar_chart_rounded, 'Progress'),
-      (Icons.person_outline_rounded, 'Profile'),
-    ];
-
-    return Container(
-      color: AppColors.background,
-      child: SafeArea(
-        top: false,
-        child: Container(
-          height: 64.h,
-          padding: EdgeInsets.symmetric(horizontal: 25.w),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(items.length, (index) {
-              final (icon, label) = items[index];
-              final isActive = index == _selectedIndex;
-              return GestureDetector(
-                onTap: () => setState(() => _selectedIndex = index),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      icon,
-                      color: isActive ? AppColors.primary : AppColors.textSecondary,
-                      size: 29.w,
-                    ),
-                    SizedBox(height: 2.h),
-                    Text(
-                      label,
-                      style: GoogleFonts.inter(
-                        color: isActive ? AppColors.primary : AppColors.textSecondary,
-                        fontSize: 10.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
-          ),
-        ),
-      ),
-    );
-  }
 }
