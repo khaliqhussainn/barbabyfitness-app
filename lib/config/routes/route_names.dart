@@ -49,4 +49,7 @@ abstract final class RouteNames {
 
   static const String profile = '/profile';
   static const String profileName = 'profile';
+
+  static const String paywall = '/paywall';
+  static const String paywallName = 'paywall';
 }
