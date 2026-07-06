@@ -40,4 +40,7 @@ abstract final class RouteNames {
 
   static const String workoutSelection = '/workouts';
   static const String workoutSelectionName = 'workout-selection';
+
+  static const String progress = '/progress';
+  static const String progressName = 'progress';
 }

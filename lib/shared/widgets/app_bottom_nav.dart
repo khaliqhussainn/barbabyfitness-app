@@ -14,6 +14,7 @@ class AppBottomNav extends StatelessWidget {
   static const _routes = [
     RouteNames.home,
     RouteNames.workoutSelection,
+    RouteNames.progress,
   ];
 
   static const _items = [
