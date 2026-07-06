@@ -52,4 +52,7 @@ abstract final class RouteNames {
 
   static const String paywall = '/paywall';
   static const String paywallName = 'paywall';
+
+  static const String workoutComplete = '/workout-complete';
+  static const String workoutCompleteName = 'workout-complete';
 }

@@ -8,6 +8,7 @@ import '../../features/progress/presentation/pages/progress_page.dart';
 import '../../features/workout_recap/presentation/pages/daily_recap_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/paywall/presentation/pages/paywall_page.dart';
+import '../../features/workout_recap/presentation/pages/workout_complete_page.dart';
 import '../../features/onboarding_flow/presentation/pages/coach_selection_page.dart';
 import '../../features/onboarding_flow/presentation/pages/fitness_level_page.dart';
 import '../../features/onboarding_flow/presentation/pages/main_goal_page.dart';
@@ -118,6 +119,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.paywall,
         name: RouteNames.paywallName,
         builder: (context, state) => const PaywallPage(),
+      ),
+      GoRoute(
+        path: RouteNames.workoutComplete,
+        name: RouteNames.workoutCompleteName,
+        builder: (context, state) => const WorkoutCompletePage(),
       ),
     ],
   );
