@@ -46,4 +46,7 @@ abstract final class RouteNames {
 
   static const String dailyRecap = '/daily-recap';
   static const String dailyRecapName = 'daily-recap';
+
+  static const String profile = '/profile';
+  static const String profileName = 'profile';
 }
