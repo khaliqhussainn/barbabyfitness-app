@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/workouts/presentation/pages/workout_selection_page.dart';
 import '../../features/progress/presentation/pages/progress_page.dart';
+import '../../features/workout_recap/presentation/pages/daily_recap_page.dart';
 import '../../features/onboarding_flow/presentation/pages/coach_selection_page.dart';
 import '../../features/onboarding_flow/presentation/pages/fitness_level_page.dart';
 import '../../features/onboarding_flow/presentation/pages/main_goal_page.dart';
@@ -100,6 +101,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.progress,
         name: RouteNames.progressName,
         builder: (context, state) => const ProgressPage(),
+      ),
+      GoRoute(
+        path: RouteNames.dailyRecap,
+        name: RouteNames.dailyRecapName,
+        builder: (context, state) => const DailyRecapPage(),
       ),
     ],
   );

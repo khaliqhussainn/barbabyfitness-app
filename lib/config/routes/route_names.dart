@@ -43,4 +43,7 @@ abstract final class RouteNames {
 
   static const String progress = '/progress';
   static const String progressName = 'progress';
+
+  static const String dailyRecap = '/daily-recap';
+  static const String dailyRecapName = 'daily-recap';
 }
