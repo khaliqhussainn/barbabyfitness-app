@@ -58,4 +58,7 @@ abstract final class RouteNames {
 
   static const String devLauncher = '/dev';
   static const String devLauncherName = 'dev-launcher';
+
+  static const String userGoals = '/user-goals';
+  static const String userGoalsName = 'user-goals';
 }

@@ -74,6 +74,7 @@ class DevLauncherPage extends StatelessWidget {
 
                   _SectionHeader('Misc'),
                   _RouteRow(label: 'Paywall', route: RouteNames.paywall),
+                  _RouteRow(label: "User's Goals", route: RouteNames.userGoals),
                 ],
               ),
             ),

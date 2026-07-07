@@ -7,6 +7,7 @@ import '../../features/workouts/presentation/pages/workout_selection_page.dart';
 import '../../features/progress/presentation/pages/progress_page.dart';
 import '../../features/workout_recap/presentation/pages/daily_recap_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/profile/presentation/pages/user_goals_page.dart';
 import '../../features/paywall/presentation/pages/paywall_page.dart';
 import '../../features/workout_recap/presentation/pages/workout_complete_page.dart';
 import '../../dev/dev_launcher_page.dart';
@@ -125,6 +126,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.workoutComplete,
         name: RouteNames.workoutCompleteName,
         builder: (context, state) => const WorkoutCompletePage(),
+      ),
+      GoRoute(
+        path: RouteNames.userGoals,
+        name: RouteNames.userGoalsName,
+        builder: (context, state) => const UserGoalsPage(),
       ),
       if (kDebugMode)
         GoRoute(
