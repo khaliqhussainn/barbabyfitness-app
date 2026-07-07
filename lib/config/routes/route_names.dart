@@ -55,4 +55,7 @@ abstract final class RouteNames {
 
   static const String workoutComplete = '/workout-complete';
   static const String workoutCompleteName = 'workout-complete';
+
+  static const String devLauncher = '/dev';
+  static const String devLauncherName = 'dev-launcher';
 }

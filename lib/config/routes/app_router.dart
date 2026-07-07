@@ -9,6 +9,7 @@ import '../../features/workout_recap/presentation/pages/daily_recap_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/paywall/presentation/pages/paywall_page.dart';
 import '../../features/workout_recap/presentation/pages/workout_complete_page.dart';
+import '../../dev/dev_launcher_page.dart';
 import '../../features/onboarding_flow/presentation/pages/coach_selection_page.dart';
 import '../../features/onboarding_flow/presentation/pages/fitness_level_page.dart';
 import '../../features/onboarding_flow/presentation/pages/main_goal_page.dart';
@@ -27,7 +28,7 @@ import 'route_names.dart';
 final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     debugLogDiagnostics: kDebugMode,
-    initialLocation: RouteNames.splash,
+    initialLocation: kDebugMode ? RouteNames.devLauncher : RouteNames.splash,
     errorBuilder: (context, state) => const UnknownPage(),
     routes: [
       GoRoute(
@@ -125,6 +126,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         name: RouteNames.workoutCompleteName,
         builder: (context, state) => const WorkoutCompletePage(),
       ),
+      if (kDebugMode)
+        GoRoute(
+          path: RouteNames.devLauncher,
+          name: RouteNames.devLauncherName,
+          builder: (context, state) => const DevLauncherPage(),
+        ),
     ],
   );
 });
