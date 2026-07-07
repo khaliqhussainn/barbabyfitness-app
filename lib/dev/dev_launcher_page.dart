@@ -69,6 +69,7 @@ class DevLauncherPage extends StatelessWidget {
                   _RouteRow(label: 'Profile', route: RouteNames.profile),
 
                   _SectionHeader('Workout Flow'),
+                  _RouteRow(label: 'Real-time Coaching', route: RouteNames.realTimeCoaching),
                   _RouteRow(label: 'Workout Complete', route: RouteNames.workoutComplete),
                   _RouteRow(label: 'Daily Recap', route: RouteNames.dailyRecap),
 

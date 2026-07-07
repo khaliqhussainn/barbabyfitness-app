@@ -8,6 +8,7 @@ import '../../features/progress/presentation/pages/progress_page.dart';
 import '../../features/workout_recap/presentation/pages/daily_recap_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/profile/presentation/pages/user_goals_page.dart';
+import '../../features/workout_session/presentation/pages/real_time_coaching_page.dart';
 import '../../features/paywall/presentation/pages/paywall_page.dart';
 import '../../features/workout_recap/presentation/pages/workout_complete_page.dart';
 import '../../dev/dev_launcher_page.dart';
@@ -131,6 +132,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.userGoals,
         name: RouteNames.userGoalsName,
         builder: (context, state) => const UserGoalsPage(),
+      ),
+      GoRoute(
+        path: RouteNames.realTimeCoaching,
+        name: RouteNames.realTimeCoachingName,
+        builder: (context, state) => const RealTimeCoachingPage(),
       ),
       if (kDebugMode)
         GoRoute(

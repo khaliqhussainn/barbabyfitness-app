@@ -61,4 +61,7 @@ abstract final class RouteNames {
 
   static const String userGoals = '/user-goals';
   static const String userGoalsName = 'user-goals';
+
+  static const String realTimeCoaching = '/workout-session';
+  static const String realTimeCoachingName = 'real-time-coaching';
 }
