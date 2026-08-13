@@ -29,8 +29,8 @@ class ProfilePage extends ConsumerWidget {
               SizedBox(height: 32.h),
               _buildTitle(),
               SizedBox(height: 24.h),
-              _buildUserRow(),
-              SizedBox(height: 32.h),
+              _buildUserRow(context),
+              SizedBox(height: 20.h),
               _buildPremiumCard(context),
               SizedBox(height: 28.h),
               _buildSectionLabel('Connected Devices'),
@@ -41,7 +41,11 @@ class ProfilePage extends ConsumerWidget {
               SizedBox(height: 28.h),
               _buildSectionLabel('Preferences'),
               SizedBox(height: 12.h),
-              _buildValueRow(label: 'Coach Voice', value: 'Motivating'),
+              _buildValueRow(
+                label: 'Coach Voice',
+                value: 'Motivating',
+                onTap: () => context.push(RouteNames.coachVoice),
+              ),
               SizedBox(height: 8.h),
               _buildValueRow(
                 label: 'Main Goal',
@@ -55,6 +59,22 @@ class ProfilePage extends ConsumerWidget {
                 onToggle: () => ref
                     .read(_notificationsProvider.notifier)
                     .state = !notificationsOn,
+              ),
+              SizedBox(height: 28.h),
+              _buildSectionLabel('Account'),
+              SizedBox(height: 12.h),
+              _buildActionRow(
+                label: 'Logout',
+                icon: Icons.logout_rounded,
+                color: AppColors.textPrimary,
+                onTap: () => _showLogoutDialog(context),
+              ),
+              SizedBox(height: 8.h),
+              _buildActionRow(
+                label: 'Delete Account',
+                icon: Icons.delete_outline_rounded,
+                color: const Color(0xFFEF4444),
+                onTap: () => _showDeleteDialog(context),
               ),
               SizedBox(height: 32.h),
             ],
@@ -76,7 +96,7 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildUserRow() {
+  Widget _buildUserRow(BuildContext context) {
     return Row(
       children: [
         Container(
@@ -93,27 +113,51 @@ class ProfilePage extends ConsumerWidget {
           ),
         ),
         SizedBox(width: 16.w),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'User',
-              style: GoogleFonts.outfit(
-                color: AppColors.textPrimary,
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w700,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'User',
+                style: GoogleFonts.outfit(
+                  color: AppColors.textPrimary,
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              SizedBox(height: 3.h),
+              Text(
+                'username@hosting.com',
+                style: GoogleFonts.inter(
+                  color: AppColors.textSecondary,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
+        ),
+        GestureDetector(
+          onTap: () => context.push(RouteNames.editProfile),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 7.h),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(100.r),
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.5),
+                width: 1,
               ),
             ),
-            SizedBox(height: 3.h),
-            Text(
-              'username@hosting.com',
+            child: Text(
+              'Edit',
               style: GoogleFonts.inter(
-                color: AppColors.textSecondary,
+                color: AppColors.primary,
                 fontSize: 12.sp,
-                fontWeight: FontWeight.w400,
+                fontWeight: FontWeight.w600,
               ),
             ),
-          ],
+          ),
         ),
       ],
     );
@@ -350,6 +394,147 @@ class ProfilePage extends ConsumerWidget {
                     ),
                   ),
                 ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionRow({
+    required String label,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        height: 61.h,
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: color, size: 20.w),
+            SizedBox(width: 12.w),
+            Text(
+              label,
+              style: GoogleFonts.outfit(
+                color: color,
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        title: Text(
+          'Logout',
+          style: GoogleFonts.outfit(
+            color: AppColors.textPrimary,
+            fontSize: 20.sp,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to logout?',
+          style: GoogleFonts.inter(
+            color: AppColors.textSecondary,
+            fontSize: 14.sp,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.inter(
+                color: AppColors.textSecondary,
+                fontSize: 14.sp,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.go(RouteNames.login);
+            },
+            child: Text(
+              'Logout',
+              style: GoogleFonts.inter(
+                color: AppColors.primary,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        title: Text(
+          'Delete Account',
+          style: GoogleFonts.outfit(
+            color: const Color(0xFFEF4444),
+            fontSize: 20.sp,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: Text(
+          'This action is permanent and cannot be undone. All your data will be deleted.',
+          style: GoogleFonts.inter(
+            color: AppColors.textSecondary,
+            fontSize: 14.sp,
+            height: 1.5,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.inter(
+                color: AppColors.textSecondary,
+                fontSize: 14.sp,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.go(RouteNames.login);
+            },
+            child: Text(
+              'Delete',
+              style: GoogleFonts.inter(
+                color: const Color(0xFFEF4444),
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),

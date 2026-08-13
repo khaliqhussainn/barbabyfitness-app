@@ -8,6 +8,8 @@ import '../../features/progress/presentation/pages/progress_page.dart';
 import '../../features/workout_recap/presentation/pages/daily_recap_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/profile/presentation/pages/user_goals_page.dart';
+import '../../features/profile/presentation/pages/edit_profile_page.dart';
+import '../../features/profile/presentation/pages/coach_voice_page.dart';
 import '../../features/workout_session/presentation/pages/real_time_coaching_page.dart';
 import '../../features/workout_session/presentation/pages/active_workout_page.dart';
 import '../../features/workouts/presentation/pages/workout_selection_v2_page.dart';
@@ -143,6 +145,16 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.userGoals,
         name: RouteNames.userGoalsName,
         builder: (context, state) => const UserGoalsPage(),
+      ),
+      GoRoute(
+        path: RouteNames.editProfile,
+        name: RouteNames.editProfileName,
+        builder: (context, state) => const EditProfilePage(),
+      ),
+      GoRoute(
+        path: RouteNames.coachVoice,
+        name: RouteNames.coachVoiceName,
+        builder: (context, state) => const CoachVoicePage(),
       ),
       GoRoute(
         path: RouteNames.realTimeCoaching,

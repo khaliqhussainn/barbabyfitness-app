@@ -79,4 +79,10 @@ abstract final class RouteNames {
 
   static const String calibrationActive = '/onboarding-flow/calibration-active';
   static const String calibrationActiveName = 'calibration-active';
+
+  static const String editProfile = '/profile/edit';
+  static const String editProfileName = 'edit-profile';
+
+  static const String coachVoice = '/profile/coach-voice';
+  static const String coachVoiceName = 'coach-voice';
 }
