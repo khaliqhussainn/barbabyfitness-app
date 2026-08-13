@@ -296,14 +296,14 @@ class _WorkoutCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 4.h),
-                Row(
+                Wrap(
+                  spacing: 8.w,
+                  runSpacing: 4.h,
                   children: [
                     _Chip(label: item.duration, icon: Icons.timer_outlined),
-                    SizedBox(width: 8.w),
                     _Chip(
-                        label: '${item.exercises} exercises',
+                        label: '${item.exercises} ex',
                         icon: Icons.list_alt_rounded),
-                    SizedBox(width: 8.w),
                     _Chip(label: item.level, icon: Icons.bar_chart_rounded),
                   ],
                 ),

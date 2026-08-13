@@ -16,6 +16,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final List<(String, String?)> _morningItems = [
+    ('5 Min Warmup', '30 MIN'),
+    ('Light Jog', '20 MIN'),
+    ('Drink 500ml Water', null),
+  ];
   final List<bool> _morningChecked = [true, false, false];
   double _hydrationCurrent = 1.2;
   static const double _hydrationTarget = 2.5;
@@ -281,7 +286,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildStartButton() {
     return GestureDetector(
-      onTap: () => context.go(
+      onTap: () => context.push(
         RouteNames.workoutDetail,
         extra: const WorkoutModel(
           name: 'HIIT Endurance',
@@ -473,9 +478,26 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildWorkoutCard(String name, String level, String duration) {
-    return Container(
-      width: 109.w,
-      height: 166.h,
+    return GestureDetector(
+      onTap: () => context.push(
+        RouteNames.workoutDetail,
+        extra: WorkoutModel(
+          name: name,
+          description: 'A great workout to improve your fitness and strength.',
+          imagePath: 'assets/images/homeimg.png',
+          duration: duration.replaceAll(' MIN', ''),
+          difficulty: level,
+          calories: '280',
+          exercises: const [
+            ('Warm Up', '5 Minutes'),
+            ('Main Set', '3 × 12'),
+            ('Cool Down', '5 Minutes'),
+          ],
+        ),
+      ),
+      child: Container(
+        width: 109.w,
+        height: 166.h,
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(8.r),
@@ -551,6 +573,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
+      ),
     );
   }
 
@@ -582,13 +605,52 @@ class _HomePageState extends State<HomePage> {
   }
 
   // ── Morning Routine ──────────────────────────────────────
-  Widget _buildMorningRoutine() {
-    final items = [
-      ('5 Min Warmup', '30 MIN'),
-      ('Light Jog', '20 MIN'),
-      ('Drink 500ml Water', null),
-    ];
+  void _showAddTodoDialog() {
+    final controller = TextEditingController();
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+        title: Text(
+          'Add Task',
+          style: GoogleFonts.outfit(color: AppColors.textPrimary, fontSize: 18.sp, fontWeight: FontWeight.w700),
+        ),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          style: GoogleFonts.inter(color: AppColors.textPrimary, fontSize: 14.sp),
+          decoration: InputDecoration(
+            hintText: 'Task name…',
+            hintStyle: GoogleFonts.inter(color: AppColors.textSecondary, fontSize: 14.sp),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.inputBorder)),
+            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.primary)),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('Cancel', style: GoogleFonts.inter(color: AppColors.textSecondary, fontSize: 14.sp)),
+          ),
+          TextButton(
+            onPressed: () {
+              final text = controller.text.trim();
+              if (text.isNotEmpty) {
+                setState(() {
+                  _morningItems.add((text, null));
+                  _morningChecked.add(false);
+                });
+              }
+              Navigator.of(ctx).pop();
+            },
+            child: Text('Add', style: GoogleFonts.inter(color: AppColors.primary, fontSize: 14.sp, fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+  }
 
+  Widget _buildMorningRoutine() {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -599,19 +661,43 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Morning Routine',
-            style: GoogleFonts.inter(
-              color: AppColors.textPrimary,
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w700,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Morning Routine',
+                style: GoogleFonts.inter(
+                  color: AppColors.textPrimary,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              GestureDetector(
+                onTap: _showAddTodoDialog,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(100.r),
+                    border: Border.all(color: AppColors.primary, width: 1),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.add, color: AppColors.primary, size: 13.w),
+                      SizedBox(width: 3.w),
+                      Text('Add', style: GoogleFonts.inter(color: AppColors.primary, fontSize: 11.sp, fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
           SizedBox(height: 12.h),
-          ...List.generate(items.length, (i) {
-            final (label, duration) = items[i];
+          ...List.generate(_morningItems.length, (i) {
+            final (label, duration) = _morningItems[i];
             return Padding(
-              padding: EdgeInsets.only(bottom: i < items.length - 1 ? 10.h : 0),
+              padding: EdgeInsets.only(bottom: i < _morningItems.length - 1 ? 10.h : 0),
               child: Row(
                 children: [
                   GestureDetector(
@@ -723,7 +809,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           GestureDetector(
-            onTap: () => context.go(
+            onTap: () => context.push(
               RouteNames.workoutDetail,
               extra: const WorkoutModel(
                 name: 'HIIT Endurance',

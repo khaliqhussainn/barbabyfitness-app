@@ -8,10 +8,19 @@ import '../../../../config/theme/app_colors.dart';
 import '../../../../shared/widgets/app_primary_button.dart';
 import '../../domain/models/workout_model.dart';
 
-class WorkoutDetailPage extends StatelessWidget {
+class WorkoutDetailPage extends StatefulWidget {
   const WorkoutDetailPage({super.key, required this.workout});
 
   final WorkoutModel workout;
+
+  @override
+  State<WorkoutDetailPage> createState() => _WorkoutDetailPageState();
+}
+
+class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
+  bool _isSaved = false;
+
+  WorkoutModel get workout => widget.workout;
 
   @override
   Widget build(BuildContext context) {
@@ -130,15 +139,21 @@ class WorkoutDetailPage extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                Container(
-                  width: 40.w,
-                  height: 40.w,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.4),
-                    shape: BoxShape.circle,
+                GestureDetector(
+                  onTap: () => setState(() => _isSaved = !_isSaved),
+                  child: Container(
+                    width: 40.w,
+                    height: 40.w,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.4),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      _isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                      color: _isSaved ? AppColors.primary : AppColors.textPrimary,
+                      size: 22.w,
+                    ),
                   ),
-                  child: Icon(Icons.bookmark_border_rounded,
-                      color: AppColors.textPrimary, size: 22.w),
                 ),
               ],
             ),
@@ -335,6 +350,8 @@ class _DifficultyCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(100.r),
             ),
             child: Text(label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.inter(
                     color: AppColors.textPrimary,
                     fontSize: 12.sp,
