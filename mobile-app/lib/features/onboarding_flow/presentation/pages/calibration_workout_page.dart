@@ -184,11 +184,11 @@ class CalibrationWorkoutPage extends StatelessWidget {
         children: [
           AppPrimaryButton(
             label: 'Start Test',
-            onPressed: () {},
+            onPressed: () => context.go(RouteNames.calibrationActive),
           ),
           SizedBox(height: 12.h),
           GestureDetector(
-            onTap: () {},
+            onTap: () => context.go(RouteNames.home),
             child: Container(
               height: 52.h,
               decoration: BoxDecoration(

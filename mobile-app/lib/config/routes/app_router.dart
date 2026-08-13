@@ -21,6 +21,7 @@ import '../../features/onboarding_flow/presentation/pages/coach_selection_page.d
 import '../../features/onboarding_flow/presentation/pages/fitness_level_page.dart';
 import '../../features/onboarding_flow/presentation/pages/main_goal_page.dart';
 import '../../features/onboarding_flow/presentation/pages/calibration_workout_page.dart';
+import '../../features/onboarding_flow/presentation/pages/calibration_active_page.dart';
 import '../../features/onboarding_flow/presentation/pages/device_permissions_page.dart';
 import '../../features/onboarding_flow/presentation/pages/personal_details_page.dart';
 import '../../features/onboarding_flow/presentation/pages/voice_selection_page.dart';
@@ -102,6 +103,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.calibrationWorkout,
         name: RouteNames.calibrationWorkoutName,
         builder: (context, state) => const CalibrationWorkoutPage(),
+      ),
+      GoRoute(
+        path: RouteNames.calibrationActive,
+        name: RouteNames.calibrationActiveName,
+        builder: (context, state) => const CalibrationActivePage(),
       ),
       GoRoute(
         path: RouteNames.workoutSelection,

@@ -76,4 +76,7 @@ abstract final class RouteNames {
 
   static const String workoutDetailV2 = '/workout-detail-v2';
   static const String workoutDetailV2Name = 'workout-detail-v2';
+
+  static const String calibrationActive = '/onboarding-flow/calibration-active';
+  static const String calibrationActiveName = 'calibration-active';
 }
