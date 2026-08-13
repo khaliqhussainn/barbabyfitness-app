@@ -58,8 +58,11 @@ class WorkoutDetailV2Page extends StatelessWidget {
           children: [
             GestureDetector(
               onTap: () => context.pop(),
-              child: Icon(Icons.arrow_back_ios_new_rounded,
-                  color: AppColors.textPrimary, size: 20.w),
+              child: Padding(
+                padding: EdgeInsets.all(8.w),
+                child: Icon(Icons.arrow_back_ios_new_rounded,
+                    color: AppColors.textPrimary, size: 20.w),
+              ),
             ),
             SizedBox(width: 16.w),
             Text(

@@ -165,8 +165,11 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         children: [
           GestureDetector(
             onTap: () => context.pop(),
-            child: Icon(Icons.chevron_left_rounded,
-                color: AppColors.textPrimary, size: 28.w),
+            child: Padding(
+              padding: EdgeInsets.all(8.w),
+              child: Icon(Icons.chevron_left_rounded,
+                  color: AppColors.textPrimary, size: 28.w),
+            ),
           ),
           SizedBox(width: 12.w),
           Text(

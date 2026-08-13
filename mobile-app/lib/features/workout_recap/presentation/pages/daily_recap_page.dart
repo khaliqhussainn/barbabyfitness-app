@@ -23,8 +23,11 @@ class DailyRecapPage extends StatelessWidget {
               padding: EdgeInsets.only(left: 16.w, top: 12.h),
               child: GestureDetector(
                 onTap: () => context.go(RouteNames.home),
-                child: Icon(Icons.arrow_back_ios_new_rounded,
-                    color: AppColors.textPrimary, size: 20.w),
+                child: Padding(
+                  padding: EdgeInsets.all(8.w),
+                  child: Icon(Icons.arrow_back_ios_new_rounded,
+                      color: AppColors.textPrimary, size: 20.w),
+                ),
               ),
             ),
             Expanded(

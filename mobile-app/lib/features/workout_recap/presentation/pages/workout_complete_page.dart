@@ -21,8 +21,11 @@ class WorkoutCompletePage extends StatelessWidget {
               right: 20.w,
               child: GestureDetector(
                 onTap: () => context.go(RouteNames.home),
-                child: Icon(Icons.close_rounded,
-                    color: AppColors.textSecondary, size: 24.w),
+                child: Padding(
+                  padding: EdgeInsets.all(8.w),
+                  child: Icon(Icons.close_rounded,
+                      color: AppColors.textSecondary, size: 24.w),
+                ),
               ),
             ),
             Column(
