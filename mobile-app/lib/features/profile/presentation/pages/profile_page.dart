@@ -16,11 +16,19 @@ import '../providers/profile_provider.dart';
 
 final _notificationsProvider = StateProvider<bool>((ref) => true);
 
-class ProfilePage extends ConsumerWidget {
+class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends ConsumerState<ProfilePage> {
+  bool _appleHealthConnected = false;
+  bool _smartWatchConnected = false;
+
+  @override
+  Widget build(BuildContext context) {
     final notificationsOn = ref.watch(_notificationsProvider);
     final profile = ref.watch(profileProvider);
     final voiceId = ref.watch(voiceSelectionProvider);
@@ -49,13 +57,13 @@ class ProfilePage extends ConsumerWidget {
               SizedBox(height: 12.h),
               _buildDeviceCard(
                 label: 'Apple Health',
-                connected: true,
+                connected: _appleHealthConnected,
                 onTap: () => _showAppleHealthSheet(context),
               ),
               SizedBox(height: 8.h),
               _buildDeviceCard(
                 label: 'SmartWatch',
-                connected: false,
+                connected: _smartWatchConnected,
                 onTap: () => _showSmartWatchSheet(context),
               ),
               SizedBox(height: 28.h),
@@ -267,7 +275,11 @@ class ProfilePage extends ConsumerWidget {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (_) => const _AppleHealthSheet(),
+      builder: (_) => _AppleHealthSheet(
+        isConnected: _appleHealthConnected,
+        onConnect: () => setState(() => _appleHealthConnected = true),
+        onDisconnect: () => setState(() => _appleHealthConnected = false),
+      ),
     );
   }
 
@@ -276,7 +288,11 @@ class ProfilePage extends ConsumerWidget {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (_) => const _SmartWatchSheet(),
+      builder: (_) => _SmartWatchSheet(
+        isConnected: _smartWatchConnected,
+        onConnect: () => setState(() => _smartWatchConnected = true),
+        onDisconnect: () => setState(() => _smartWatchConnected = false),
+      ),
     );
   }
 
@@ -587,7 +603,15 @@ class ProfilePage extends ConsumerWidget {
 
 // ── Apple Health Bottom Sheet ─────────────────────────────
 class _AppleHealthSheet extends StatefulWidget {
-  const _AppleHealthSheet();
+  const _AppleHealthSheet({
+    required this.isConnected,
+    required this.onConnect,
+    required this.onDisconnect,
+  });
+
+  final bool isConnected;
+  final VoidCallback onConnect;
+  final VoidCallback onDisconnect;
 
   @override
   State<_AppleHealthSheet> createState() => _AppleHealthSheetState();
@@ -646,9 +670,13 @@ class _AppleHealthSheetState extends State<_AppleHealthSheet> {
                           color: AppColors.textPrimary,
                           fontSize: 20.sp,
                           fontWeight: FontWeight.w700)),
-                  Text('Choose what data to sync',
-                      style: GoogleFonts.inter(
-                          color: AppColors.textSecondary, fontSize: 12.sp)),
+                  Text(
+                    widget.isConnected ? 'Connected' : 'Choose what data to sync',
+                    style: GoogleFonts.inter(
+                        color: widget.isConnected
+                            ? const Color(0xFF22C55E)
+                            : AppColors.textSecondary,
+                        fontSize: 12.sp)),
                 ],
               ),
             ],
@@ -659,23 +687,50 @@ class _AppleHealthSheetState extends State<_AppleHealthSheet> {
           _ToggleRow(label: 'Active Calories', icon: Icons.local_fire_department_rounded, value: _calories, onChanged: (v) => setState(() => _calories = v)),
           _ToggleRow(label: 'Sleep', icon: Icons.bedtime_rounded, value: _sleep, onChanged: (v) => setState(() => _sleep = v)),
           SizedBox(height: 24.h),
-          GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
-            child: Container(
-              width: double.infinity,
-              height: 52.h,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFF2D55),
-                borderRadius: BorderRadius.circular(100.r),
+          if (widget.isConnected) ...[
+            GestureDetector(
+              onTap: () {
+                widget.onDisconnect();
+                Navigator.of(context).pop();
+              },
+              child: Container(
+                width: double.infinity,
+                height: 52.h,
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(100.r),
+                  border: Border.all(color: Colors.red.withValues(alpha: 0.4), width: 1.5),
+                ),
+                alignment: Alignment.center,
+                child: Text('Disconnect',
+                    style: GoogleFonts.outfit(
+                        color: Colors.red,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w700)),
               ),
-              alignment: Alignment.center,
-              child: Text('Connect Apple Health',
-                  style: GoogleFonts.outfit(
-                      color: Colors.white,
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w700)),
             ),
-          ),
+          ] else ...[
+            GestureDetector(
+              onTap: () {
+                widget.onConnect();
+                Navigator.of(context).pop();
+              },
+              child: Container(
+                width: double.infinity,
+                height: 52.h,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF2D55),
+                  borderRadius: BorderRadius.circular(100.r),
+                ),
+                alignment: Alignment.center,
+                child: Text('Connect Apple Health',
+                    style: GoogleFonts.outfit(
+                        color: Colors.white,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w700)),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -684,7 +739,15 @@ class _AppleHealthSheetState extends State<_AppleHealthSheet> {
 
 // ── Smart Watch Bottom Sheet ──────────────────────────────
 class _SmartWatchSheet extends StatefulWidget {
-  const _SmartWatchSheet();
+  const _SmartWatchSheet({
+    required this.isConnected,
+    required this.onConnect,
+    required this.onDisconnect,
+  });
+
+  final bool isConnected;
+  final VoidCallback onConnect;
+  final VoidCallback onDisconnect;
 
   @override
   State<_SmartWatchSheet> createState() => _SmartWatchSheetState();
@@ -747,9 +810,13 @@ class _SmartWatchSheetState extends State<_SmartWatchSheet> {
                           color: AppColors.textPrimary,
                           fontSize: 20.sp,
                           fontWeight: FontWeight.w700)),
-                  Text('Select your watch brand',
-                      style: GoogleFonts.inter(
-                          color: AppColors.textSecondary, fontSize: 12.sp)),
+                  Text(
+                    widget.isConnected ? 'Connected' : 'Select your watch brand',
+                    style: GoogleFonts.inter(
+                        color: widget.isConnected
+                            ? const Color(0xFF22C55E)
+                            : AppColors.textSecondary,
+                        fontSize: 12.sp)),
                 ],
               ),
             ],
@@ -801,31 +868,60 @@ class _SmartWatchSheetState extends State<_SmartWatchSheet> {
             );
           }),
           SizedBox(height: 14.h),
-          GestureDetector(
-            onTap: _selectedWatch >= 0 ? () => Navigator.of(context).pop() : null,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: double.infinity,
-              height: 52.h,
-              decoration: BoxDecoration(
-                color: _selectedWatch >= 0
-                    ? const Color(0xFF3B82F6)
-                    : const Color(0xFF3A3A3A),
-                borderRadius: BorderRadius.circular(100.r),
+          if (widget.isConnected) ...[
+            GestureDetector(
+              onTap: () {
+                widget.onDisconnect();
+                Navigator.of(context).pop();
+              },
+              child: Container(
+                width: double.infinity,
+                height: 52.h,
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(100.r),
+                  border: Border.all(color: Colors.red.withValues(alpha: 0.4), width: 1.5),
+                ),
+                alignment: Alignment.center,
+                child: Text('Disconnect',
+                    style: GoogleFonts.outfit(
+                        color: Colors.red,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w700)),
               ),
-              alignment: Alignment.center,
-              child: Text(
-                'Connect Watch',
-                style: GoogleFonts.outfit(
+            ),
+          ] else ...[
+            GestureDetector(
+              onTap: _selectedWatch >= 0
+                  ? () {
+                      widget.onConnect();
+                      Navigator.of(context).pop();
+                    }
+                  : null,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: double.infinity,
+                height: 52.h,
+                decoration: BoxDecoration(
                   color: _selectedWatch >= 0
-                      ? Colors.white
-                      : AppColors.textSecondary,
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w700,
+                      ? const Color(0xFF3B82F6)
+                      : const Color(0xFF3A3A3A),
+                  borderRadius: BorderRadius.circular(100.r),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  'Connect Watch',
+                  style: GoogleFonts.outfit(
+                    color: _selectedWatch >= 0
+                        ? Colors.white
+                        : AppColors.textSecondary,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );
