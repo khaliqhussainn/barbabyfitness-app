@@ -47,9 +47,17 @@ class ProfilePage extends ConsumerWidget {
               SizedBox(height: 28.h),
               _buildSectionLabel('Connected Devices'),
               SizedBox(height: 12.h),
-              _buildDeviceCard(label: 'Apple Health', connected: true),
+              _buildDeviceCard(
+                label: 'Apple Health',
+                connected: true,
+                onTap: () => _showAppleHealthSheet(context),
+              ),
               SizedBox(height: 8.h),
-              _buildDeviceCard(label: 'SmartWatch', connected: false),
+              _buildDeviceCard(
+                label: 'SmartWatch',
+                connected: false,
+                onTap: () => _showSmartWatchSheet(context),
+              ),
               SizedBox(height: 28.h),
               _buildSectionLabel('Preferences'),
               SizedBox(height: 12.h),
@@ -254,8 +262,28 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildDeviceCard({required String label, required bool connected}) {
-    return Container(
+  void _showAppleHealthSheet(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => const _AppleHealthSheet(),
+    );
+  }
+
+  void _showSmartWatchSheet(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => const _SmartWatchSheet(),
+    );
+  }
+
+  Widget _buildDeviceCard({required String label, required bool connected, VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       width: double.infinity,
       height: 61.h,
       padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -300,6 +328,7 @@ class ProfilePage extends ConsumerWidget {
             ],
           ),
         ],
+      ),
       ),
     );
   }
@@ -549,6 +578,301 @@ class ProfilePage extends ConsumerWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Apple Health Bottom Sheet ─────────────────────────────
+class _AppleHealthSheet extends StatefulWidget {
+  const _AppleHealthSheet();
+
+  @override
+  State<_AppleHealthSheet> createState() => _AppleHealthSheetState();
+}
+
+class _AppleHealthSheetState extends State<_AppleHealthSheet> {
+  bool _steps = true;
+  bool _heartRate = true;
+  bool _calories = false;
+  bool _sleep = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(28.r),
+          topRight: Radius.circular(28.r),
+        ),
+      ),
+      padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 40.h),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 40.w,
+              height: 4.h,
+              decoration: BoxDecoration(
+                color: const Color(0xFF3A3A3A),
+                borderRadius: BorderRadius.circular(2.r),
+              ),
+            ),
+          ),
+          SizedBox(height: 24.h),
+          Row(
+            children: [
+              Container(
+                width: 44.w,
+                height: 44.w,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF2D55).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                alignment: Alignment.center,
+                child: Icon(Icons.favorite_rounded, color: const Color(0xFFFF2D55), size: 24.w),
+              ),
+              SizedBox(width: 14.w),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Apple Health',
+                      style: GoogleFonts.outfit(
+                          color: AppColors.textPrimary,
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.w700)),
+                  Text('Choose what data to sync',
+                      style: GoogleFonts.inter(
+                          color: AppColors.textSecondary, fontSize: 12.sp)),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: 24.h),
+          _ToggleRow(label: 'Steps', icon: Icons.directions_walk_rounded, value: _steps, onChanged: (v) => setState(() => _steps = v)),
+          _ToggleRow(label: 'Heart Rate', icon: Icons.monitor_heart_rounded, value: _heartRate, onChanged: (v) => setState(() => _heartRate = v)),
+          _ToggleRow(label: 'Active Calories', icon: Icons.local_fire_department_rounded, value: _calories, onChanged: (v) => setState(() => _calories = v)),
+          _ToggleRow(label: 'Sleep', icon: Icons.bedtime_rounded, value: _sleep, onChanged: (v) => setState(() => _sleep = v)),
+          SizedBox(height: 24.h),
+          GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Container(
+              width: double.infinity,
+              height: 52.h,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFF2D55),
+                borderRadius: BorderRadius.circular(100.r),
+              ),
+              alignment: Alignment.center,
+              child: Text('Connect Apple Health',
+                  style: GoogleFonts.outfit(
+                      color: Colors.white,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w700)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Smart Watch Bottom Sheet ──────────────────────────────
+class _SmartWatchSheet extends StatefulWidget {
+  const _SmartWatchSheet();
+
+  @override
+  State<_SmartWatchSheet> createState() => _SmartWatchSheetState();
+}
+
+class _SmartWatchSheetState extends State<_SmartWatchSheet> {
+  int _selectedWatch = -1;
+
+  static const _watches = [
+    ('Apple Watch', 'Series 8 / Ultra'),
+    ('Garmin', 'Forerunner / Fenix'),
+    ('Samsung Galaxy Watch', 'Watch 5 / 6'),
+    ('Fitbit', 'Sense / Versa'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(28.r),
+          topRight: Radius.circular(28.r),
+        ),
+      ),
+      padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 40.h),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 40.w,
+              height: 4.h,
+              decoration: BoxDecoration(
+                color: const Color(0xFF3A3A3A),
+                borderRadius: BorderRadius.circular(2.r),
+              ),
+            ),
+          ),
+          SizedBox(height: 24.h),
+          Row(
+            children: [
+              Container(
+                width: 44.w,
+                height: 44.w,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                alignment: Alignment.center,
+                child: Icon(Icons.watch_rounded, color: const Color(0xFF3B82F6), size: 24.w),
+              ),
+              SizedBox(width: 14.w),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Smart Watch',
+                      style: GoogleFonts.outfit(
+                          color: AppColors.textPrimary,
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.w700)),
+                  Text('Select your watch brand',
+                      style: GoogleFonts.inter(
+                          color: AppColors.textSecondary, fontSize: 12.sp)),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: 20.h),
+          ...List.generate(_watches.length, (i) {
+            final (name, subtitle) = _watches[i];
+            final selected = _selectedWatch == i;
+            return GestureDetector(
+              onTap: () => setState(() => _selectedWatch = i),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                margin: EdgeInsets.only(bottom: 10.h),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                decoration: BoxDecoration(
+                  color: selected
+                      ? AppColors.primary.withValues(alpha: 0.12)
+                      : AppColors.background,
+                  borderRadius: BorderRadius.circular(14.r),
+                  border: Border.all(
+                    color: selected ? AppColors.primary : Colors.transparent,
+                    width: 1.5,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(name,
+                              style: GoogleFonts.inter(
+                                  color: AppColors.textPrimary,
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w600)),
+                          Text(subtitle,
+                              style: GoogleFonts.inter(
+                                  color: AppColors.textSecondary,
+                                  fontSize: 11.sp)),
+                        ],
+                      ),
+                    ),
+                    if (selected)
+                      Icon(Icons.check_circle_rounded,
+                          color: AppColors.primary, size: 20.w),
+                  ],
+                ),
+              ),
+            );
+          }),
+          SizedBox(height: 14.h),
+          GestureDetector(
+            onTap: _selectedWatch >= 0 ? () => Navigator.of(context).pop() : null,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: double.infinity,
+              height: 52.h,
+              decoration: BoxDecoration(
+                color: _selectedWatch >= 0
+                    ? const Color(0xFF3B82F6)
+                    : const Color(0xFF3A3A3A),
+                borderRadius: BorderRadius.circular(100.r),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                'Connect Watch',
+                style: GoogleFonts.outfit(
+                  color: _selectedWatch >= 0
+                      ? Colors.white
+                      : AppColors.textSecondary,
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Toggle Row ────────────────────────────────────────────
+class _ToggleRow extends StatelessWidget {
+  const _ToggleRow(
+      {required this.label,
+      required this.icon,
+      required this.value,
+      required this.onChanged});
+  final String label;
+  final IconData icon;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 14.h),
+      child: Row(
+        children: [
+          Container(
+            width: 36.w,
+            height: 36.w,
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            alignment: Alignment.center,
+            child: Icon(icon, color: AppColors.textSecondary, size: 18.w),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Text(label,
+                style: GoogleFonts.inter(
+                    color: AppColors.textPrimary,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500)),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeColor: AppColors.primary,
+            activeTrackColor: AppColors.primary.withValues(alpha: 0.3),
           ),
         ],
       ),
