@@ -189,22 +189,24 @@ class _CoachCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      width: 118.w,
-      height: 346.h,
-      decoration: BoxDecoration(
-        color: isSelected
-            ? AppColors.primary.withValues(alpha: 0.08)
-            : AppColors.surface,
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(
-          color: isSelected ? AppColors.primary : Colors.transparent,
-          width: 1.5,
+    return GestureDetector(
+      onTap: onSelect,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 118.w,
+        height: 346.h,
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.08)
+              : AppColors.surface,
+          borderRadius: BorderRadius.circular(20.r),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : Colors.transparent,
+            width: 1.5,
+          ),
         ),
-      ),
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 16.h),
-      child: Column(
+        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 16.h),
+        child: Column(
         children: [
           Text(
             coach.title,
@@ -243,6 +245,7 @@ class _CoachCard extends StatelessWidget {
           _SelectButton(isSelected: isSelected, onTap: onSelect),
         ],
       ),
+    ),
     );
   }
 }

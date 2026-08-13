@@ -19,14 +19,25 @@ class DailyRecapPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Back arrow
-            Padding(
-              padding: EdgeInsets.only(left: 16.w, top: 12.h),
-              child: GestureDetector(
-                onTap: () => context.go(RouteNames.home),
-                child: Padding(
-                  padding: EdgeInsets.all(8.w),
-                  child: Icon(Icons.arrow_back_ios_new_rounded,
-                      color: AppColors.textPrimary, size: 20.w),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: EdgeInsets.only(left: 8.w, top: 12.h),
+                child: GestureDetector(
+                  onTap: () => context.pop(),
+                  child: Container(
+                    width: 40.w,
+                    height: 40.w,
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: AppColors.textPrimary,
+                      size: 18.w,
+                    ),
+                  ),
                 ),
               ),
             ),
