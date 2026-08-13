@@ -7,7 +7,7 @@ import '../../../../config/routes/route_names.dart';
 import '../../../../config/theme/app_colors.dart';
 import '../../../../shared/widgets/app_logo.dart';
 import '../../../../shared/widgets/app_primary_button.dart';
-import 'login_page.dart' show _AuthField;
+import '../../../../shared/widgets/auth_field.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -111,7 +111,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               ),
             ),
             SizedBox(height: 20.h),
-            _AuthField(
+            AuthField(
               hintText: 'Email',
               prefixIcon: Icons.alternate_email,
               controller: _emailController,

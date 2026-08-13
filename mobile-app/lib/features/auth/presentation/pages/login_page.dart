@@ -7,6 +7,7 @@ import '../../../../config/routes/route_names.dart';
 import '../../../../config/theme/app_colors.dart';
 import '../../../../shared/widgets/app_logo.dart';
 import '../../../../shared/widgets/app_primary_button.dart';
+import '../../../../shared/widgets/auth_field.dart';
 import '../../../../shared/widgets/or_divider.dart';
 import '../../../../shared/widgets/social_login_row.dart';
 
@@ -161,7 +162,7 @@ class _LoginPageState extends State<LoginPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _AuthField(
+        AuthField(
           hintText: 'Email',
           prefixIcon: Icons.alternate_email,
           controller: _emailController,
@@ -183,7 +184,7 @@ class _LoginPageState extends State<LoginPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _AuthField(
+        AuthField(
           hintText: 'Password',
           prefixIcon: Icons.key_outlined,
           controller: _passwordController,
@@ -273,85 +274,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Shared styled text field used on both auth pages
-// ---------------------------------------------------------------------------
-class _AuthField extends StatelessWidget {
-  const _AuthField({
-    required this.hintText,
-    required this.prefixIcon,
-    this.controller,
-    this.obscureText = false,
-    this.keyboardType,
-    this.textInputAction,
-    this.suffixIcon,
-    this.hasError = false,
-    this.onChanged,
-  });
-
-  final String hintText;
-  final IconData prefixIcon;
-  final TextEditingController? controller;
-  final bool obscureText;
-  final TextInputType? keyboardType;
-  final TextInputAction? textInputAction;
-  final Widget? suffixIcon;
-  final bool hasError;
-  final ValueChanged<String>? onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final errorColor = AppColors.error;
-    final normalBorder = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(100.r),
-      borderSide: BorderSide(
-        color: hasError ? errorColor : AppColors.inputBorder,
-      ),
-    );
-    final focusedBorder = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(100.r),
-      borderSide: BorderSide(
-        color: hasError ? errorColor : AppColors.primary,
-        width: 1.5,
-      ),
-    );
-
-    return TextField(
-      controller: controller,
-      obscureText: obscureText,
-      keyboardType: keyboardType,
-      textInputAction: textInputAction,
-      onChanged: onChanged,
-      style: GoogleFonts.inter(
-        color: AppColors.textPrimary,
-        fontSize: 14.sp,
-      ),
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: GoogleFonts.inter(
-          color: AppColors.inputHint,
-          fontSize: 14.sp,
-        ),
-        prefixIcon: Icon(
-          prefixIcon,
-          color: hasError ? errorColor : AppColors.inputHint,
-          size: 18.sp,
-        ),
-        suffixIcon: suffixIcon,
-        filled: true,
-        fillColor: hasError
-            ? AppColors.error.withValues(alpha: 0.05)
-            : Colors.transparent,
-        border: normalBorder,
-        enabledBorder: normalBorder,
-        focusedBorder: focusedBorder,
-        contentPadding:
-            EdgeInsets.symmetric(vertical: 16.h, horizontal: 20.w),
       ),
     );
   }

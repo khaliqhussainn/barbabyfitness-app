@@ -7,9 +7,9 @@ import '../../../../config/routes/route_names.dart';
 import '../../../../config/theme/app_colors.dart';
 import '../../../../shared/widgets/app_logo.dart';
 import '../../../../shared/widgets/app_primary_button.dart';
+import '../../../../shared/widgets/auth_field.dart';
 import '../../../../shared/widgets/or_divider.dart';
 import '../../../../shared/widgets/social_login_row.dart';
-import 'login_page.dart' show _AuthField;
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -186,7 +186,7 @@ class _SignupPageState extends State<SignupPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _AuthField(
+        AuthField(
           hintText: 'Full Name',
           prefixIcon: Icons.person_outline_rounded,
           controller: _nameController,
@@ -208,7 +208,7 @@ class _SignupPageState extends State<SignupPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _AuthField(
+        AuthField(
           hintText: 'Email',
           prefixIcon: Icons.alternate_email,
           controller: _emailController,
@@ -231,7 +231,7 @@ class _SignupPageState extends State<SignupPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _AuthField(
+        AuthField(
           hintText: 'Password',
           prefixIcon: Icons.key_outlined,
           controller: _passwordController,
@@ -273,7 +273,7 @@ class _SignupPageState extends State<SignupPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _AuthField(
+        AuthField(
           hintText: 'Confirm Password',
           prefixIcon: Icons.key_outlined,
           controller: _confirmPasswordController,
