@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
+import '../../features/saved_workouts/presentation/pages/saved_workouts_page.dart';
+import '../../features/notifications/presentation/pages/notifications_page.dart';
 import '../../features/workouts/presentation/pages/workout_selection_page.dart';
 import '../../features/progress/presentation/pages/progress_page.dart';
 import '../../features/workout_recap/presentation/pages/daily_recap_page.dart';
@@ -184,6 +186,16 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => WorkoutDetailV2Page(
           workout: state.extra as WorkoutModel,
         ),
+      ),
+      GoRoute(
+        path: RouteNames.savedWorkouts,
+        name: RouteNames.savedWorkoutsName,
+        builder: (context, state) => const SavedWorkoutsPage(),
+      ),
+      GoRoute(
+        path: RouteNames.notifications,
+        name: RouteNames.notificationsName,
+        builder: (context, state) => const NotificationsPage(),
       ),
       if (kDebugMode)
         GoRoute(

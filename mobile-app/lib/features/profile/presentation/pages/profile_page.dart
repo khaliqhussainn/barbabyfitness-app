@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,6 +10,9 @@ import 'package:go_router/go_router.dart';
 import '../../../../config/routes/route_names.dart';
 import '../../../../config/theme/app_colors.dart';
 import '../../../../shared/widgets/app_bottom_nav.dart';
+import '../../../onboarding_flow/domain/entities/voice_model.dart';
+import '../../../onboarding_flow/presentation/providers/voice_selection_provider.dart';
+import '../providers/profile_provider.dart';
 
 final _notificationsProvider = StateProvider<bool>((ref) => true);
 
@@ -17,6 +22,13 @@ class ProfilePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notificationsOn = ref.watch(_notificationsProvider);
+    final profile = ref.watch(profileProvider);
+    final voiceId = ref.watch(voiceSelectionProvider);
+    final voiceLabel = voices
+        .firstWhere((v) => v.id == voiceId, orElse: () => voices.first)
+        .label
+        .split(' ')
+        .first;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -29,7 +41,7 @@ class ProfilePage extends ConsumerWidget {
               SizedBox(height: 32.h),
               _buildTitle(),
               SizedBox(height: 24.h),
-              _buildUserRow(context),
+              _buildUserRow(context, profile),
               SizedBox(height: 20.h),
               _buildPremiumCard(context),
               SizedBox(height: 28.h),
@@ -43,7 +55,7 @@ class ProfilePage extends ConsumerWidget {
               SizedBox(height: 12.h),
               _buildValueRow(
                 label: 'Coach Voice',
-                value: 'Motivating',
+                value: voiceLabel,
                 onTap: () => context.push(RouteNames.coachVoice),
               ),
               SizedBox(height: 8.h),
@@ -96,7 +108,7 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildUserRow(BuildContext context) {
+  Widget _buildUserRow(BuildContext context, ProfileState profile) {
     return Row(
       children: [
         Container(
@@ -106,11 +118,11 @@ class ProfilePage extends ConsumerWidget {
             color: AppColors.surface,
             shape: BoxShape.circle,
           ),
-          child: Icon(
-            Icons.person_outline_rounded,
-            color: AppColors.textSecondary,
-            size: 32.w,
-          ),
+          clipBehavior: Clip.antiAlias,
+          child: profile.imagePath != null
+              ? Image.file(File(profile.imagePath!), fit: BoxFit.cover)
+              : Icon(Icons.person_outline_rounded,
+                  color: AppColors.textSecondary, size: 32.w),
         ),
         SizedBox(width: 16.w),
         Expanded(
@@ -118,7 +130,7 @@ class ProfilePage extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'User',
+                profile.username,
                 style: GoogleFonts.outfit(
                   color: AppColors.textPrimary,
                   fontSize: 18.sp,
@@ -127,7 +139,7 @@ class ProfilePage extends ConsumerWidget {
               ),
               SizedBox(height: 3.h),
               Text(
-                'username@hosting.com',
+                profile.email,
                 style: GoogleFonts.inter(
                   color: AppColors.textSecondary,
                   fontSize: 12.sp,
