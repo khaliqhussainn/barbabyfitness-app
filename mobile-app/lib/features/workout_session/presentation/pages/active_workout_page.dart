@@ -20,17 +20,20 @@ class _ActiveWorkoutPageState extends State<ActiveWorkoutPage> {
   late Timer _timer;
   bool _isPaused = false;
   int _selectedRpe = 1; // 0=Easy, 1=Push, 2=Hold
+  int _caloriesBurned = 0;
+
+  static const _totalExercises = 10;
 
   final List<Map<String, String>> _exercises = [
-    {'name': 'High Knees', 'sets': '3 × 20'},
-    {'name': 'Burpees', 'sets': '3 × 10'},
-    {'name': 'Jump Squats', 'reps': '15', 'sets': '3 × 15'},
-    {'name': 'Mountain Climbers', 'reps': '45', 'unit': 'Seconds'},
-    {'name': 'Plank Hold', 'reps': '60', 'unit': 'Seconds'},
-    {'name': 'Jump Lunges', 'sets': '3 × 12'},
+    {'name': 'High Knees', 'sets': '3 × 20', 'unit': 'Reps'},
+    {'name': 'Burpees', 'sets': '3 × 10', 'unit': 'Reps'},
+    {'name': 'Jump Squats', 'sets': '3 × 15', 'unit': 'Reps'},
+    {'name': 'Mountain Climbers', 'sets': '45 Seconds', 'unit': 'Seconds'},
+    {'name': 'Plank Hold', 'sets': '60 Seconds', 'unit': 'Seconds'},
+    {'name': 'Jump Lunges', 'sets': '3 × 12', 'unit': 'Reps'},
   ];
 
-  final int _currentIndex = 2; // Jump Squats
+  final int _currentIndex = 3; // Exercise 4 of 10
 
   @override
   void initState() {
@@ -40,7 +43,13 @@ class _ActiveWorkoutPageState extends State<ActiveWorkoutPage> {
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!_isPaused && mounted) setState(() => _elapsedSeconds++);
+      if (!_isPaused && mounted) {
+        setState(() {
+          _elapsedSeconds++;
+          // ~0.75 kcal/sec rough estimate
+          if (_elapsedSeconds % 2 == 0) _caloriesBurned++;
+        });
+      }
     });
   }
 
@@ -48,6 +57,12 @@ class _ActiveWorkoutPageState extends State<ActiveWorkoutPage> {
   void dispose() {
     _timer.cancel();
     super.dispose();
+  }
+
+  String get _timerDisplay {
+    final m = (_elapsedSeconds ~/ 60).toString().padLeft(2, '0');
+    final s = (_elapsedSeconds % 60).toString().padLeft(2, '0');
+    return '$m:$s';
   }
 
   void _showPauseModal() {
@@ -72,9 +87,11 @@ class _ActiveWorkoutPageState extends State<ActiveWorkoutPage> {
 
   @override
   Widget build(BuildContext context) {
-    final current = _exercises[_currentIndex];
-    final next = _exercises[_currentIndex + 1];
-    final double progress = (_currentIndex + 1) / _exercises.length;
+    final current = _exercises[_currentIndex % _exercises.length];
+    final next = _exercises[(_currentIndex + 1) % _exercises.length];
+    final int exerciseNumber = _currentIndex + 1;
+    final double progress = exerciseNumber / _totalExercises;
+    final int pct = (progress * 100).round();
 
     return PopScope(
       canPop: false,
@@ -87,265 +104,418 @@ class _ActiveWorkoutPageState extends State<ActiveWorkoutPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-            _buildProgressBar(progress),
-            SizedBox(height: 16.h),
-            // Coach icon top-right
-            Padding(
-              padding: EdgeInsets.only(right: 20.w),
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: GestureDetector(
-                  onTap: () => context.go(RouteNames.realTimeCoaching),
-                  child: Container(
-                    width: 38.w,
-                    height: 38.w,
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      shape: BoxShape.circle,
+              // ── Header ──────────────────────────────────────
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Selected Workout',
+                            style: GoogleFonts.outfit(
+                              color: AppColors.textPrimary,
+                              fontSize: 22.sp,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          SizedBox(height: 2.h),
+                          Text(
+                            'HIIT Endurance · Set 1',
+                            style: GoogleFonts.inter(
+                              color: AppColors.textSecondary,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    child: Icon(
-                      Icons.headset_mic_rounded,
-                      color: AppColors.primary,
-                      size: 20.w,
+                    GestureDetector(
+                      onTap: _showPauseModal,
+                      child: Container(
+                        width: 40.w,
+                        height: 40.w,
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(Icons.pause_rounded,
+                            color: AppColors.textPrimary, size: 22.w),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-            ),
-            SizedBox(height: 12.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 25.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Now',
-                    style: GoogleFonts.inter(
-                      color: AppColors.textSecondary,
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    current['name']!,
-                    style: GoogleFonts.outfit(
-                      color: AppColors.textPrimary,
-                      fontSize: 30.sp,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    current['reps'] ?? current['sets']!.split(' × ').last,
-                    style: GoogleFonts.outfit(
-                      color: AppColors.textPrimary,
-                      fontSize: 68.sp,
-                      fontWeight: FontWeight.w800,
-                      height: 1,
-                    ),
-                  ),
-                  Text(
-                    current['unit'] ?? 'Reps',
-                    style: GoogleFonts.outfit(
-                      color: AppColors.textPrimary,
-                      fontSize: 26.sp,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 20.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 25.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Effort',
-                    style: GoogleFonts.inter(
-                      color: AppColors.textSecondary,
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  SizedBox(height: 10.h),
-                  _buildRpeButtons(),
-                ],
-              ),
-            ),
-            SizedBox(height: 20.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 25.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Next',
-                    style: GoogleFonts.inter(
-                      color: AppColors.textSecondary,
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  SizedBox(height: 6.h),
-                  Text(
-                    next['name']!,
-                    style: GoogleFonts.outfit(
-                      color: AppColors.textPrimary,
-                      fontSize: 20.sp,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  Text(
-                    next['sets'] ??
-                        '${next['reps']!} ${next['unit'] ?? 'Reps'}',
-                    style: GoogleFonts.inter(
-                      color: AppColors.textSecondary,
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Spacer(),
-            _buildBottomControls(),
-            SizedBox(height: 32.h),
-          ],
-        ),
-      ),
-    ),
-    );
-  }
 
-  Widget _buildProgressBar(double progress) {
-    return Column(
-      children: [
-        ClipRRect(
-          child: LinearProgressIndicator(
-            value: progress,
-            minHeight: 5.h,
-            backgroundColor: AppColors.surface,
-            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 8.h),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${(progress * 100).round()}% Complete',
-                style: GoogleFonts.inter(
-                  color: AppColors.textSecondary,
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w400,
+              // ── Progress bar ─────────────────────────────────
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(100.r),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 6.h,
+                    backgroundColor: AppColors.surface,
+                    valueColor:
+                        const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                  ),
                 ),
               ),
-              Text(
-                'Exercise ${_currentIndex + 1} / ${_exercises.length}',
-                style: GoogleFonts.inter(
-                  color: AppColors.textSecondary,
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w400,
+              SizedBox(height: 6.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Exercise $exerciseNumber of $_totalExercises',
+                      style: GoogleFonts.inter(
+                        color: AppColors.textSecondary,
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    Text(
+                      '$pct% Complete',
+                      style: GoogleFonts.inter(
+                        color: AppColors.textSecondary,
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
                 ),
               ),
+              SizedBox(height: 14.h),
+
+              // ── Exercise name ────────────────────────────────
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      current['name']!,
+                      style: GoogleFonts.outfit(
+                        color: AppColors.textPrimary,
+                        fontSize: 26.sp,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    SizedBox(height: 2.h),
+                    Text(
+                      current['sets']!,
+                      style: GoogleFonts.inter(
+                        color: AppColors.textSecondary,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 12.h),
+
+              // ── Exercise image ───────────────────────────────
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Container(
+                  width: double.infinity,
+                  height: 190.h,
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(16.r),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16.r),
+                    child: Image.asset(
+                      'assets/images/homeimg.png',
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Center(
+                        child: Icon(
+                          Icons.fitness_center_rounded,
+                          color: AppColors.textSecondary.withValues(alpha: 0.3),
+                          size: 48.w,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 12.h),
+
+              // ── Coach Tip ────────────────────────────────────
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(14.r),
+                  ),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CircleAvatar(
+                        radius: 20.r,
+                        backgroundColor:
+                            AppColors.primary.withValues(alpha: 0.15),
+                        child: Icon(Icons.person_rounded,
+                            color: AppColors.primary, size: 22.w),
+                      ),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Coach Tip',
+                              style: GoogleFonts.inter(
+                                color: AppColors.textSecondary,
+                                fontSize: 11.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            SizedBox(height: 3.h),
+                            Text(
+                              'Focus on maintaining proper form before increasing speed. Consistency always beats intensity.',
+                              style: GoogleFonts.inter(
+                                color: AppColors.textPrimary,
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w400,
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 12.h),
+
+              // ── RPE Buttons ──────────────────────────────────
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Row(
+                  children: List.generate(3, (i) {
+                    final labels = ['Easy', 'Push', 'Hold'];
+                    final isSelected = _selectedRpe == i;
+                    return Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.only(right: i < 2 ? 10.w : 0),
+                        child: GestureDetector(
+                          onTap: () => setState(() => _selectedRpe = i),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            height: 52.h,
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? AppColors.primary.withValues(alpha: 0.18)
+                                  : AppColors.surface,
+                              borderRadius: BorderRadius.circular(14.r),
+                              border: isSelected
+                                  ? Border.all(
+                                      color: AppColors.primary, width: 1.8)
+                                  : null,
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: AppColors.primary
+                                            .withValues(alpha: 0.3),
+                                        blurRadius: 10,
+                                        spreadRadius: 1,
+                                      ),
+                                    ]
+                                  : null,
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              labels[i],
+                              style: GoogleFonts.outfit(
+                                color: AppColors.textPrimary,
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+              SizedBox(height: 12.h),
+
+              // ── Up Next ──────────────────────────────────────
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(14.r),
+                  ),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Up Next',
+                              style: GoogleFonts.inter(
+                                color: AppColors.textSecondary,
+                                fontSize: 11.sp,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              next['name']!,
+                              style: GoogleFonts.outfit(
+                                color: AppColors.textPrimary,
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            SizedBox(height: 2.h),
+                            Text(
+                              next['sets']!,
+                              style: GoogleFonts.inter(
+                                color: AppColors.textSecondary,
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10.r),
+                        child: Container(
+                          width: 56.w,
+                          height: 56.w,
+                          color: AppColors.background,
+                          child: Image.asset(
+                            'assets/images/homeimg.png',
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Icon(
+                              Icons.fitness_center_rounded,
+                              color: AppColors.textSecondary
+                                  .withValues(alpha: 0.4),
+                              size: 24.w,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 12.h),
+
+              // ── Stats ────────────────────────────────────────
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(14.r),
+                  ),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                  child: IntrinsicHeight(
+                    child: Row(
+                      children: [
+                        _StatCell(
+                            label: 'Elapsed Time', value: _timerDisplay),
+                        _VertDivider(),
+                        _StatCell(
+                            label: 'Calories Burned',
+                            value: '$_caloriesBurned',
+                            unit: 'kcal'),
+                        _VertDivider(),
+                        _StatCell(label: 'Heart Rate', value: '--', unit: 'BPM'),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 16.h),
             ],
           ),
         ),
-      ],
+      ),
     );
   }
+}
 
-  Widget _buildRpeButtons() {
-    final labels = ['Easy', 'Push', 'Hold'];
-    return Row(
-      children: List.generate(3, (i) {
-        final isSelected = _selectedRpe == i;
-        return Padding(
-          padding: EdgeInsets.only(right: i < 2 ? 10.w : 0),
-          child: GestureDetector(
-            onTap: () => setState(() => _selectedRpe = i),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              height: 40.h,
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary : AppColors.surface,
-                borderRadius: BorderRadius.circular(100.r),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                labels[i],
-                style: GoogleFonts.outfit(
-                  color: AppColors.textPrimary,
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        );
-      }),
-    );
-  }
+class _StatCell extends StatelessWidget {
+  const _StatCell({required this.label, required this.value, this.unit});
+  final String label;
+  final String value;
+  final String? unit;
 
-  Widget _buildBottomControls() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 40.w),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
         children: [
-          GestureDetector(
-            onTap: _showPauseModal,
-            child: Column(
-              children: [
-                Container(
-                  width: 68.w,
-                  height: 68.w,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(Icons.pause_rounded,
-                      color: Colors.white, size: 30.w),
-                ),
-                SizedBox(height: 6.h),
-                Text('Pause',
-                    style: GoogleFonts.inter(
-                        color: AppColors.textSecondary,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w400)),
-              ],
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              color: AppColors.textSecondary,
+              fontSize: 10.sp,
+              fontWeight: FontWeight.w400,
             ),
           ),
-          GestureDetector(
-            onTap: () => context.go(RouteNames.workoutComplete),
-            child: Column(
+          SizedBox(height: 4.h),
+          RichText(
+            text: TextSpan(
               children: [
-                Container(
-                  width: 68.w,
-                  height: 68.w,
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    shape: BoxShape.circle,
+                TextSpan(
+                  text: value,
+                  style: GoogleFonts.outfit(
+                    color: AppColors.textPrimary,
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.w700,
                   ),
-                  child: Icon(Icons.stop_rounded,
-                      color: AppColors.textPrimary, size: 30.w),
                 ),
-                SizedBox(height: 6.h),
-                Text('End',
+                if (unit != null)
+                  TextSpan(
+                    text: ' $unit',
                     style: GoogleFonts.inter(
-                        color: AppColors.textSecondary,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w400)),
+                      color: AppColors.textSecondary,
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _VertDivider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 1,
+      margin: EdgeInsets.symmetric(horizontal: 8.w),
+      color: AppColors.background,
     );
   }
 }
