@@ -196,6 +196,7 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
 
   Widget _buildHeightCard(
       PersonalDetails details, PersonalDetailsNotifier notifier) {
+    final isFt = details.heightUnit == HeightUnit.ft;
     return _DetailCard(
       label: 'Height',
       child: Row(
@@ -203,11 +204,28 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
           Expanded(
             child: TextField(
               controller: _heightController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              keyboardType: TextInputType.text,
+              inputFormatters: [
+                isFt
+                    ? FilteringTextInputFormatter.allow(RegExp(r'''[0-9\'"]+'''))
+                    : FilteringTextInputFormatter.digitsOnly,
+              ],
               onChanged: (v) {
-                final parsed = int.tryParse(v);
-                if (parsed != null) notifier.setHeight(parsed);
+                if (isFt) {
+                  // Parse formats: 5'11" or 5'11 or 5
+                  final match = RegExp(r'''(\d+)'(\d*)\"?''').firstMatch(v);
+                  if (match != null) {
+                    final feet = int.tryParse(match.group(1) ?? '') ?? 0;
+                    final inches = int.tryParse(match.group(2) ?? '') ?? 0;
+                    notifier.setHeight(feet * 12 + inches);
+                  } else {
+                    final feet = int.tryParse(v.replaceAll(RegExp(r'''[^0-9]'''), ''));
+                    if (feet != null) notifier.setHeight(feet * 12);
+                  }
+                } else {
+                  final parsed = int.tryParse(v);
+                  if (parsed != null) notifier.setHeight(parsed);
+                }
               },
               style: TextStyle(
                 color: AppColors.textPrimary,
@@ -218,7 +236,7 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
-                hintText: 'Enter your height',
+                hintText: isFt ? "e.g. 5'11\"" : 'e.g. 175',
                 hintStyle: TextStyle(
                   color: AppColors.inputHint.withValues(alpha: 0.5),
                   fontSize: 13.sp,
@@ -233,7 +251,10 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
             selected: details.heightUnit,
             leftValue: HeightUnit.cm,
             rightValue: HeightUnit.ft,
-            onChanged: notifier.setHeightUnit,
+            onChanged: (unit) {
+              _heightController.clear();
+              notifier.setHeightUnit(unit);
+            },
           ),
         ],
       ),
@@ -242,6 +263,7 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
 
   Widget _buildWeightCard(
       PersonalDetails details, PersonalDetailsNotifier notifier) {
+    final isLbs = details.weightUnit == WeightUnit.lbs;
     return _DetailCard(
       label: 'Weight',
       child: Row(
@@ -249,10 +271,12 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
           Expanded(
             child: TextField(
               controller: _weightController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+              ],
               onChanged: (v) {
-                final parsed = int.tryParse(v);
+                final parsed = double.tryParse(v);
                 if (parsed != null) notifier.setWeight(parsed);
               },
               style: TextStyle(
@@ -264,7 +288,7 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
-                hintText: 'Enter your weight',
+                hintText: isLbs ? 'e.g. 154.5' : 'e.g. 70.5',
                 hintStyle: TextStyle(
                   color: AppColors.inputHint.withValues(alpha: 0.5),
                   fontSize: 13.sp,
@@ -279,7 +303,10 @@ class _PersonalDetailsPageState extends ConsumerState<PersonalDetailsPage> {
             selected: details.weightUnit,
             leftValue: WeightUnit.kg,
             rightValue: WeightUnit.lbs,
-            onChanged: notifier.setWeightUnit,
+            onChanged: (unit) {
+              _weightController.clear();
+              notifier.setWeightUnit(unit);
+            },
           ),
         ],
       ),
