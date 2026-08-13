@@ -91,4 +91,7 @@ abstract final class RouteNames {
 
   static const String notifications = '/notifications';
   static const String notificationsName = 'notifications';
+
+  static const String todoList = '/todo-list';
+  static const String todoListName = 'todo-list';
 }
