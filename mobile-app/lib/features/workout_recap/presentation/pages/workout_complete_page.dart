@@ -16,18 +16,6 @@ class WorkoutCompletePage extends StatelessWidget {
       body: SafeArea(
         child: Stack(
           children: [
-            Positioned(
-              top: 16.h,
-              right: 20.w,
-              child: GestureDetector(
-                onTap: () => context.go(RouteNames.home),
-                child: Padding(
-                  padding: EdgeInsets.all(8.w),
-                  child: Icon(Icons.close_rounded,
-                      color: AppColors.textSecondary, size: 24.w),
-                ),
-              ),
-            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -52,6 +40,18 @@ class WorkoutCompletePage extends StatelessWidget {
                 ),
                 _buildContinueButton(context),
               ],
+            ),
+            Positioned(
+              top: 16.h,
+              right: 20.w,
+              child: GestureDetector(
+                onTap: () => context.go(RouteNames.home),
+                child: Padding(
+                  padding: EdgeInsets.all(8.w),
+                  child: Icon(Icons.close_rounded,
+                      color: AppColors.textSecondary, size: 24.w),
+                ),
+              ),
             ),
           ],
         ),

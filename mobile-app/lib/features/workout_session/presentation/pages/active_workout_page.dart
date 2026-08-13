@@ -76,12 +76,17 @@ class _ActiveWorkoutPageState extends State<ActiveWorkoutPage> {
     final next = _exercises[_currentIndex + 1];
     final double progress = (_currentIndex + 1) / _exercises.length;
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _showPauseModal();
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
             _buildProgressBar(progress),
             SizedBox(height: 16.h),
             // Coach icon top-right
@@ -211,6 +216,7 @@ class _ActiveWorkoutPageState extends State<ActiveWorkoutPage> {
           ],
         ),
       ),
+    ),
     );
   }
 
