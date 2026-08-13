@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/saved_workouts/presentation/pages/saved_workouts_page.dart';
 import '../../features/notifications/presentation/pages/notifications_page.dart';
+import '../../features/todo/presentation/pages/todo_list_page.dart';
 import '../../features/workouts/presentation/pages/workout_selection_page.dart';
 import '../../features/progress/presentation/pages/progress_page.dart';
 import '../../features/workout_recap/presentation/pages/daily_recap_page.dart';
@@ -196,6 +197,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.notifications,
         name: RouteNames.notificationsName,
         builder: (context, state) => const NotificationsPage(),
+      ),
+      GoRoute(
+        path: RouteNames.todoList,
+        name: RouteNames.todoListName,
+        builder: (context, state) => const TodoListPage(),
       ),
       if (kDebugMode)
         GoRoute(

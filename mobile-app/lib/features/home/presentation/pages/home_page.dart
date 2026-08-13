@@ -590,7 +590,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         GestureDetector(
-          onTap: () => context.push(RouteNames.workoutSelectionV2),
+          onTap: () => context.push(RouteNames.todoList),
           child: Text(
             'See All',
             style: GoogleFonts.inter(
