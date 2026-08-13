@@ -10,7 +10,7 @@ class PersonalDetails {
     this.gender = Gender.male,
     this.height = 175,
     this.heightUnit = HeightUnit.cm,
-    this.weight = 70,
+    this.weight = 70.0,
     this.weightUnit = WeightUnit.kg,
   });
 
@@ -18,7 +18,7 @@ class PersonalDetails {
   final Gender gender;
   final int height;
   final HeightUnit heightUnit;
-  final int weight;
+  final double weight;
   final WeightUnit weightUnit;
 
   PersonalDetails copyWith({
@@ -26,7 +26,7 @@ class PersonalDetails {
     Gender? gender,
     int? height,
     HeightUnit? heightUnit,
-    int? weight,
+    double? weight,
     WeightUnit? weightUnit,
   }) {
     return PersonalDetails(
@@ -47,7 +47,7 @@ class PersonalDetailsNotifier extends StateNotifier<PersonalDetails> {
   void setGender(Gender gender) => state = state.copyWith(gender: gender);
   void setHeight(int height) => state = state.copyWith(height: height);
   void setHeightUnit(HeightUnit unit) => state = state.copyWith(heightUnit: unit);
-  void setWeight(int weight) => state = state.copyWith(weight: weight);
+  void setWeight(double weight) => state = state.copyWith(weight: weight);
   void setWeightUnit(WeightUnit unit) => state = state.copyWith(weightUnit: unit);
 }
 
