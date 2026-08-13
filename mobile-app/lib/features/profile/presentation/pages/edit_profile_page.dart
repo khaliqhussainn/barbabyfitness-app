@@ -1,26 +1,40 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../config/theme/app_colors.dart';
 import '../../../../shared/widgets/app_primary_button.dart';
+import '../providers/profile_provider.dart';
 
-class EditProfilePage extends StatefulWidget {
+class EditProfilePage extends ConsumerStatefulWidget {
   const EditProfilePage({super.key});
 
   @override
-  State<EditProfilePage> createState() => _EditProfilePageState();
+  ConsumerState<EditProfilePage> createState() => _EditProfilePageState();
 }
 
-class _EditProfilePageState extends State<EditProfilePage> {
-  final _usernameController = TextEditingController(text: 'User');
-  final _emailController = TextEditingController(text: 'username@hosting.com');
-  final _ageController = TextEditingController(text: '25');
+class _EditProfilePageState extends ConsumerState<EditProfilePage> {
+  late TextEditingController _usernameController;
+  late TextEditingController _emailController;
+  late TextEditingController _ageController;
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
+
+  @override
+  void initState() {
+    super.initState();
+    final profile = ref.read(profileProvider);
+    _usernameController = TextEditingController(text: profile.username);
+    _emailController = TextEditingController(text: profile.email);
+    _ageController = TextEditingController(text: profile.age);
+  }
 
   @override
   void dispose() {
@@ -32,8 +46,43 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.dispose();
   }
 
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+    if (picked != null) {
+      ref.read(profileProvider.notifier).setImage(picked.path);
+    }
+  }
+
+  void _save() {
+    ref.read(profileProvider.notifier).update(
+          username: _usernameController.text.trim(),
+          email: _emailController.text.trim(),
+          age: _ageController.text.trim(),
+        );
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Profile updated successfully',
+          style: GoogleFonts.inter(color: Colors.white),
+        ),
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+      ),
+    );
+    context.pop();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final profile = ref.watch(profileProvider);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -49,7 +98,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 24.h),
-                    _buildAvatar(),
+                    _buildAvatar(profile),
                     SizedBox(height: 32.h),
                     _buildSectionLabel('Personal Info'),
                     SizedBox(height: 14.h),
@@ -79,8 +128,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       label: 'New Password',
                       controller: _passwordController,
                       obscure: _obscurePassword,
-                      onToggle: () =>
-                          setState(() => _obscurePassword = !_obscurePassword),
+                      onToggle: () => setState(
+                          () => _obscurePassword = !_obscurePassword),
                     ),
                     SizedBox(height: 12.h),
                     _buildPasswordField(
@@ -99,22 +148,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               padding: EdgeInsets.symmetric(horizontal: 25.w),
               child: AppPrimaryButton(
                 label: 'Save Changes',
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Profile updated successfully',
-                        style: GoogleFonts.inter(color: Colors.white),
-                      ),
-                      backgroundColor: AppColors.primary,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                    ),
-                  );
-                  context.pop();
-                },
+                onPressed: _save,
               ),
             ),
             SizedBox(height: 32.h),
@@ -148,32 +182,41 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Widget _buildAvatar() {
+  Widget _buildAvatar(ProfileState profile) {
     return Center(
-      child: Stack(
-        alignment: Alignment.bottomRight,
-        children: [
-          Container(
-            width: 88.w,
-            height: 88.w,
-            decoration: const BoxDecoration(
-              color: AppColors.surface,
-              shape: BoxShape.circle,
+      child: GestureDetector(
+        onTap: _pickImage,
+        child: Stack(
+          alignment: Alignment.bottomRight,
+          children: [
+            Container(
+              width: 88.w,
+              height: 88.w,
+              decoration: const BoxDecoration(
+                color: AppColors.surface,
+                shape: BoxShape.circle,
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: profile.imagePath != null
+                  ? Image.file(
+                      File(profile.imagePath!),
+                      fit: BoxFit.cover,
+                    )
+                  : Icon(Icons.person_outline_rounded,
+                      color: AppColors.textSecondary, size: 44.w),
             ),
-            child: Icon(Icons.person_outline_rounded,
-                color: AppColors.textSecondary, size: 44.w),
-          ),
-          Container(
-            width: 30.w,
-            height: 30.w,
-            decoration: const BoxDecoration(
-              color: AppColors.primary,
-              shape: BoxShape.circle,
+            Container(
+              width: 30.w,
+              height: 30.w,
+              decoration: const BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.camera_alt_rounded,
+                  color: Colors.white, size: 16.w),
             ),
-            child: Icon(Icons.camera_alt_rounded,
-                color: Colors.white, size: 16.w),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
