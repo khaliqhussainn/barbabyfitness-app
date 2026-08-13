@@ -17,6 +17,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final List<bool> _morningChecked = [true, false, false];
+  double _hydrationCurrent = 1.2;
+  static const double _hydrationTarget = 2.5;
 
   @override
   Widget build(BuildContext context) {
@@ -66,28 +68,31 @@ class _HomePageState extends State<HomePage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Hello Username',
-              style: GoogleFonts.outfit(
-                color: AppColors.textPrimary,
-                fontSize: 26.sp,
-                fontWeight: FontWeight.w800,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Hello Username',
+                style: GoogleFonts.outfit(
+                  color: AppColors.textPrimary,
+                  fontSize: 26.sp,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
-            ),
-            SizedBox(height: 4.h),
-            Text(
-              'Stay Strong. Your future self is watching.',
-              style: GoogleFonts.inter(
-                color: AppColors.textSecondary,
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w400,
+              SizedBox(height: 4.h),
+              Text(
+                'Stay Strong. Your future self is watching.',
+                style: GoogleFonts.inter(
+                  color: AppColors.textSecondary,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+        SizedBox(width: 8.w),
         Row(
           children: [
             GestureDetector(
@@ -275,64 +280,42 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildStartButton() {
-    return Row(
-      children: [
-        Expanded(
-          child: GestureDetector(
-            onTap: () => context.go(
-      RouteNames.workoutDetail,
-      extra: const WorkoutModel(
-        name: 'HIIT Endurance',
-        description: 'High intensity interval training to boost stamina and burn fat. Improve cardiovascular endurance, build explosive strength and maximum calorie burn.',
-        imagePath: 'assets/images/homeimg.png',
-        duration: '30',
-        difficulty: 'Intermediate',
-        calories: '320',
-        exercises: [
-          ('High Knees', '3 × 20'),
-          ('Burpees', '3 × 10'),
-          ('Jump Squats', '3 × 15'),
-          ('Mountain Climbers', '3 × 20'),
-          ('Plank Hold', '60 Seconds'),
-          ('Jump Lunges', '3 × 12'),
-        ],
+    return GestureDetector(
+      onTap: () => context.go(
+        RouteNames.workoutDetail,
+        extra: const WorkoutModel(
+          name: 'HIIT Endurance',
+          description: 'High intensity interval training to boost stamina and burn fat. Improve cardiovascular endurance, build explosive strength and maximum calorie burn.',
+          imagePath: 'assets/images/homeimg.png',
+          duration: '30',
+          difficulty: 'Intermediate',
+          calories: '320',
+          exercises: [
+            ('High Knees', '3 × 20'),
+            ('Burpees', '3 × 10'),
+            ('Jump Squats', '3 × 15'),
+            ('Mountain Climbers', '3 × 20'),
+            ('Plank Hold', '60 Seconds'),
+            ('Jump Lunges', '3 × 12'),
+          ],
+        ),
       ),
-    ),
-            child: Container(
-            height: 45.h,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(10.r),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              'Start Workout',
-              style: GoogleFonts.inter(
-                color: AppColors.onPrimary,
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
+      child: Container(
+        height: 45.h,
+        decoration: BoxDecoration(
+          color: AppColors.primary,
+          borderRadius: BorderRadius.circular(10.r),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          'Start Workout',
+          style: GoogleFonts.inter(
+            color: AppColors.onPrimary,
+            fontSize: 15.sp,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        SizedBox(width: 8.w),
-        Container(
-          width: 45.h,
-          height: 45.h,
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.4),
-            shape: BoxShape.circle,
-          ),
-          child: Center(
-            child: Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: AppColors.textPrimary,
-              size: 14.w,
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -451,12 +434,15 @@ class _HomePageState extends State<HomePage> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        Text(
-          'See All',
-          style: GoogleFonts.inter(
-            color: AppColors.primary,
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w500,
+        GestureDetector(
+          onTap: () => context.push(RouteNames.workoutSelectionV2),
+          child: Text(
+            'See All',
+            style: GoogleFonts.inter(
+              color: AppColors.primary,
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ],
@@ -580,12 +566,15 @@ class _HomePageState extends State<HomePage> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        Text(
-          'See All',
-          style: GoogleFonts.inter(
-            color: AppColors.primary,
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w500,
+        GestureDetector(
+          onTap: () => context.push(RouteNames.workoutSelectionV2),
+          child: Text(
+            'See All',
+            style: GoogleFonts.inter(
+              color: AppColors.primary,
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ],
@@ -733,20 +722,41 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          Container(
-            height: 34.h,
-            padding: EdgeInsets.symmetric(horizontal: 18.w),
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(100.r),
+          GestureDetector(
+            onTap: () => context.go(
+              RouteNames.workoutDetail,
+              extra: const WorkoutModel(
+                name: 'HIIT Endurance',
+                description: 'High intensity interval training to boost stamina and burn fat. Improve cardiovascular endurance, build explosive strength and maximum calorie burn.',
+                imagePath: 'assets/images/homeimg.png',
+                duration: '30',
+                difficulty: 'Intermediate',
+                calories: '320',
+                exercises: [
+                  ('High Knees', '3 × 20'),
+                  ('Burpees', '3 × 10'),
+                  ('Jump Squats', '3 × 15'),
+                  ('Mountain Climbers', '3 × 20'),
+                  ('Plank Hold', '60 Seconds'),
+                  ('Jump Lunges', '3 × 12'),
+                ],
+              ),
             ),
-            alignment: Alignment.center,
-            child: Text(
-              'Start',
-              style: GoogleFonts.inter(
-                color: AppColors.onPrimary,
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w600,
+            child: Container(
+              height: 34.h,
+              padding: EdgeInsets.symmetric(horizontal: 18.w),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(100.r),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                'Start',
+                style: GoogleFonts.inter(
+                  color: AppColors.onPrimary,
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
@@ -757,9 +767,7 @@ class _HomePageState extends State<HomePage> {
 
   // ── Hydration Goal ───────────────────────────────────────
   Widget _buildHydrationGoal() {
-    const double current = 1.2;
-    const double target = 2.5;
-    final double progress = current / target;
+    final double progress = (_hydrationCurrent / _hydrationTarget).clamp(0.0, 1.0);
 
     return Container(
       width: double.infinity,
@@ -787,7 +795,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   SizedBox(height: 2.h),
                   Text(
-                    'Target ${target}L',
+                    'Target ${_hydrationTarget}L',
                     style: GoogleFonts.inter(
                       color: AppColors.textSecondary,
                       fontSize: 11.sp,
@@ -796,58 +804,84 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
-              Container(
-                height: 30.h,
-                padding: EdgeInsets.symmetric(horizontal: 12.w),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(100.r),
-                  border: Border.all(color: AppColors.primary, width: 1),
-                ),
-                alignment: Alignment.center,
-                child: Row(
-                  children: [
-                    Icon(Icons.add, color: AppColors.primary, size: 14.w),
-                    SizedBox(width: 4.w),
-                    Text(
-                      'Add 250ml',
-                      style: GoogleFonts.inter(
-                        color: AppColors.primary,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w600,
+              GestureDetector(
+                onTap: () => setState(() {
+                  _hydrationCurrent = (_hydrationCurrent + 0.25).clamp(0.0, _hydrationTarget);
+                }),
+                child: Container(
+                  height: 30.h,
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(100.r),
+                    border: Border.all(color: AppColors.primary, width: 1),
+                  ),
+                  alignment: Alignment.center,
+                  child: Row(
+                    children: [
+                      Icon(Icons.add, color: AppColors.primary, size: 14.w),
+                      SizedBox(width: 4.w),
+                      Text(
+                        'Add 250ml',
+                        style: GoogleFonts.inter(
+                          color: AppColors.primary,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 14.h),
-          Stack(
-            alignment: Alignment.centerRight,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(100.r),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  minHeight: 10.h,
-                  backgroundColor: AppColors.background,
-                  valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 6.h),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              '${current}L',
-              style: GoogleFonts.inter(
-                color: AppColors.textSecondary,
-                fontSize: 11.sp,
-                fontWeight: FontWeight.w500,
-              ),
+          SizedBox(height: 8.h),
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              trackHeight: 8.h,
+              thumbShape: RoundSliderThumbShape(enabledThumbRadius: 8.w),
+              overlayShape: RoundSliderOverlayShape(overlayRadius: 16.w),
+              activeTrackColor: AppColors.primary,
+              inactiveTrackColor: AppColors.background,
+              thumbColor: AppColors.primary,
+              overlayColor: AppColors.primary.withValues(alpha: 0.15),
             ),
+            child: Slider(
+              value: _hydrationCurrent,
+              min: 0,
+              max: _hydrationTarget,
+              divisions: 10,
+              onChanged: (value) => setState(() => _hydrationCurrent = value),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '0L',
+                style: GoogleFonts.inter(
+                  color: AppColors.textSecondary,
+                  fontSize: 11.sp,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              Text(
+                '${_hydrationCurrent.toStringAsFixed(2)}L / ${_hydrationTarget}L',
+                style: GoogleFonts.inter(
+                  color: AppColors.textSecondary,
+                  fontSize: 11.sp,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                '${_hydrationTarget}L',
+                style: GoogleFonts.inter(
+                  color: AppColors.textSecondary,
+                  fontSize: 11.sp,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ],
           ),
         ],
       ),
