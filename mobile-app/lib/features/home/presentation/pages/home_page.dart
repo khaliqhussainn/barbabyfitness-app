@@ -88,32 +88,70 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        GestureDetector(
-          onTap: () => context.push(RouteNames.paywall),
-          child: Container(
-            width: 42.w,
-            height: 42.w,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppColors.primary, Color(0xFFFF8C00)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.35),
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () => context.push(RouteNames.savedWorkouts),
+              child: Container(
+                width: 42.w,
+                height: 42.w,
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  shape: BoxShape.circle,
                 ),
-              ],
+                child: Icon(
+                  Icons.bookmark_border_rounded,
+                  color: AppColors.textSecondary,
+                  size: 20.w,
+                ),
+              ),
             ),
-            child: Icon(
-              Icons.workspace_premium_rounded,
-              color: Colors.white,
-              size: 21.w,
+            SizedBox(width: 10.w),
+            GestureDetector(
+              onTap: () => context.push(RouteNames.notifications),
+              child: Container(
+                width: 42.w,
+                height: 42.w,
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.notifications_outlined,
+                  color: AppColors.textSecondary,
+                  size: 20.w,
+                ),
+              ),
             ),
-          ),
+            SizedBox(width: 10.w),
+            GestureDetector(
+              onTap: () => context.push(RouteNames.paywall),
+              child: Container(
+                width: 42.w,
+                height: 42.w,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [AppColors.primary, Color(0xFFFF8C00)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.35),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.workspace_premium_rounded,
+                  color: Colors.white,
+                  size: 21.w,
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );

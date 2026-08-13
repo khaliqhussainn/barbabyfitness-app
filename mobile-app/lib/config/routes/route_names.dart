@@ -85,4 +85,10 @@ abstract final class RouteNames {
 
   static const String coachVoice = '/profile/coach-voice';
   static const String coachVoiceName = 'coach-voice';
+
+  static const String savedWorkouts = '/saved-workouts';
+  static const String savedWorkoutsName = 'saved-workouts';
+
+  static const String notifications = '/notifications';
+  static const String notificationsName = 'notifications';
 }
