@@ -155,14 +155,22 @@ class _PaywallPageState extends State<PaywallPage> {
   Widget _buildCloseButton(BuildContext context) {
     return Align(
       alignment: Alignment.topRight,
-      child: Padding(
-        padding: EdgeInsets.only(top: 16.h, right: 20.w),
-        child: GestureDetector(
-          onTap: () => context.pop(),
-          child: Icon(
-            Icons.close_rounded,
-            color: AppColors.textSecondary,
-            size: 24.w,
+      child: GestureDetector(
+        onTap: () => context.pop(),
+        child: Padding(
+          padding: EdgeInsets.only(top: 12.h, right: 12.w),
+          child: Container(
+            width: 36.w,
+            height: 36.w,
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.close_rounded,
+              color: AppColors.textSecondary,
+              size: 20.w,
+            ),
           ),
         ),
       ),

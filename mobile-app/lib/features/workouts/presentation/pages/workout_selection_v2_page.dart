@@ -290,6 +290,8 @@ class _DifficultyColumn extends StatelessWidget {
               borderRadius: BorderRadius.circular(100.r),
             ),
             child: Text(label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.inter(
                     color: AppColors.textPrimary,
                     fontSize: 12.sp,
