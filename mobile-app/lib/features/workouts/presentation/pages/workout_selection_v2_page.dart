@@ -78,7 +78,7 @@ class WorkoutSelectionV2Page extends StatelessWidget {
                 separatorBuilder: (_, __) => SizedBox(height: 16.h),
                 itemBuilder: (context, index) => _WorkoutCard(
                   workout: _workouts[index],
-                  onViewDetails: () => context.go(
+                  onViewDetails: () => context.push(
                     RouteNames.workoutDetail,
                     extra: _workouts[index],
                   ),
@@ -121,11 +121,18 @@ class WorkoutSelectionV2Page extends StatelessWidget {
   }
 }
 
-class _WorkoutCard extends StatelessWidget {
+class _WorkoutCard extends StatefulWidget {
   const _WorkoutCard({required this.workout, required this.onViewDetails});
 
   final WorkoutModel workout;
   final VoidCallback onViewDetails;
+
+  @override
+  State<_WorkoutCard> createState() => _WorkoutCardState();
+}
+
+class _WorkoutCardState extends State<_WorkoutCard> {
+  bool _isSaved = false;
 
   @override
   Widget build(BuildContext context) {
@@ -138,21 +145,46 @@ class _WorkoutCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: double.infinity,
-            height: 190.h,
-            child: Image.asset(
-              workout.imagePath,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                color: AppColors.background,
-                child: Icon(
-                  Icons.fitness_center_rounded,
-                  color: AppColors.textSecondary.withValues(alpha: 0.3),
-                  size: 48.w,
+          Stack(
+            children: [
+              SizedBox(
+                width: double.infinity,
+                height: 190.h,
+                child: Image.asset(
+                  widget.workout.imagePath,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    color: AppColors.background,
+                    child: Icon(
+                      Icons.fitness_center_rounded,
+                      color: AppColors.textSecondary.withValues(alpha: 0.3),
+                      size: 48.w,
+                    ),
+                  ),
                 ),
               ),
-            ),
+              Positioned(
+                top: 12.h,
+                right: 12.w,
+                child: GestureDetector(
+                  onTap: () => setState(() => _isSaved = !_isSaved),
+                  child: Container(
+                    width: 36.w,
+                    height: 36.w,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.45),
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      _isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                      color: _isSaved ? AppColors.primary : Colors.white,
+                      size: 18.w,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(16.w, 14.h, 16.w, 16.h),
@@ -160,7 +192,7 @@ class _WorkoutCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  workout.name,
+                  widget.workout.name,
                   style: GoogleFonts.outfit(
                     color: AppColors.textPrimary,
                     fontSize: 22.sp,
@@ -169,7 +201,7 @@ class _WorkoutCard extends StatelessWidget {
                 ),
                 SizedBox(height: 4.h),
                 Text(
-                  workout.description,
+                  widget.workout.description,
                   style: GoogleFonts.inter(
                     color: AppColors.textSecondary,
                     fontSize: 13.sp,
@@ -183,15 +215,15 @@ class _WorkoutCard extends StatelessWidget {
                     children: [
                       _StatColumn(
                         label: 'Duration',
-                        value: workout.duration,
+                        value: widget.workout.duration,
                         unit: 'Minutes',
                       ),
                       _VertDivider(),
-                      _DifficultyColumn(label: workout.difficulty),
+                      _DifficultyColumn(label: widget.workout.difficulty),
                       _VertDivider(),
                       _CaloriesColumn(
                         label: 'Estimated Calories',
-                        value: workout.calories,
+                        value: widget.workout.calories,
                       ),
                     ],
                   ),
@@ -200,7 +232,7 @@ class _WorkoutCard extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerRight,
                   child: GestureDetector(
-                    onTap: onViewDetails,
+                    onTap: widget.onViewDetails,
                     child: Container(
                       height: 40.h,
                       padding: EdgeInsets.symmetric(horizontal: 22.w),
