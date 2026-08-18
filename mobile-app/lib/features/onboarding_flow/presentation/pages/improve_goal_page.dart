@@ -7,15 +7,14 @@ import '../../../../config/routes/route_names.dart';
 import '../../../../config/theme/app_colors.dart';
 import '../../../../shared/widgets/app_logo.dart';
 import '../../../../shared/widgets/app_primary_button.dart';
-import '../../domain/entities/main_goal_model.dart';
-import '../providers/main_goal_provider.dart';
+import '../providers/improve_goal_provider.dart';
 
-class MainGoalPage extends ConsumerWidget {
-  const MainGoalPage({super.key});
+class ImproveGoalPage extends ConsumerWidget {
+  const ImproveGoalPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedId = ref.watch(mainGoalProvider);
+    final selected = ref.watch(improveGoalProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -28,11 +27,11 @@ class MainGoalPage extends ConsumerWidget {
             SizedBox(height: 48.h),
             _buildHeader(),
             SizedBox(height: 32.h),
-            _buildOptions(ref, selectedId),
+            _buildOptions(ref, selected),
             const Spacer(),
             _buildPaginationDots(),
             SizedBox(height: 24.h),
-            _buildConfirmButton(context),
+            _buildConfirmButton(context, selected),
             SizedBox(height: 32.h),
           ],
         ),
@@ -49,7 +48,7 @@ class MainGoalPage extends ConsumerWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: GestureDetector(
-              onTap: () => context.go(RouteNames.fitnessLevel),
+              onTap: () => context.go(RouteNames.mainGoal),
               child: Container(
                 width: 40.w,
                 height: 40.w,
@@ -77,7 +76,7 @@ class MainGoalPage extends ConsumerWidget {
       child: Column(
         children: [
           Text(
-            'Your Main Goal',
+            'What do you want\nto improve?',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: AppColors.textPrimary,
@@ -88,7 +87,7 @@ class MainGoalPage extends ConsumerWidget {
           ),
           SizedBox(height: 10.h),
           Text(
-            'What are we focusing on first?',
+            'Your coach will tailor feedback around this goal.',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: AppColors.textSecondary,
@@ -101,19 +100,19 @@ class MainGoalPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildOptions(WidgetRef ref, MainGoalId selectedId) {
+  Widget _buildOptions(WidgetRef ref, ImproveGoal? selected) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Column(
-        children: mainGoals.map((goal) {
-          final isSelected = goal.id == selectedId;
+        children: ImproveGoal.values.map((goal) {
+          final isSelected = goal == selected;
           return Padding(
             padding: EdgeInsets.only(bottom: 12.h),
             child: _GoalOptionRow(
               goal: goal,
               isSelected: isSelected,
               onTap: () =>
-                  ref.read(mainGoalProvider.notifier).state = goal.id,
+                  ref.read(improveGoalProvider.notifier).state = goal,
             ),
           );
         }).toList(),
@@ -142,17 +141,20 @@ class MainGoalPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildConfirmButton(BuildContext context) {
+  Widget _buildConfirmButton(BuildContext context, ImproveGoal? selected) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: AppPrimaryButton(
         label: 'Confirm Goal',
-        onPressed: () => context.go(RouteNames.improveGoal),
+        onPressed: selected != null
+            ? () => context.go(RouteNames.personalDetails)
+            : null,
       ),
     );
   }
 }
 
+// ── Option Row ────────────────────────────────────────────
 class _GoalOptionRow extends StatelessWidget {
   const _GoalOptionRow({
     required this.goal,
@@ -160,7 +162,7 @@ class _GoalOptionRow extends StatelessWidget {
     required this.onTap,
   });
 
-  final MainGoalModel goal;
+  final ImproveGoal goal;
   final bool isSelected;
   final VoidCallback onTap;
 
@@ -171,7 +173,7 @@ class _GoalOptionRow extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         width: 354.w,
-        height: 120.h,
+        height: 90.h,
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primary.withValues(alpha: 0.12)
@@ -185,6 +187,25 @@ class _GoalOptionRow extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 20.w),
         child: Row(
           children: [
+            // Emoji badge
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 48.w,
+              height: 48.w,
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? AppColors.primary.withValues(alpha: 0.18)
+                    : AppColors.background,
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                goal.emoji,
+                style: TextStyle(fontSize: 22.sp),
+              ),
+            ),
+            SizedBox(width: 16.w),
+            // Text
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -194,22 +215,23 @@ class _GoalOptionRow extends StatelessWidget {
                     goal.title,
                     style: TextStyle(
                       color: AppColors.textPrimary,
-                      fontSize: 18.sp,
+                      fontSize: 17.sp,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  SizedBox(height: 4.h),
+                  SizedBox(height: 3.h),
                   Text(
                     goal.subtitle,
                     style: TextStyle(
                       color: AppColors.textSecondary,
-                      fontSize: 14.sp,
+                      fontSize: 13.sp,
                       fontWeight: FontWeight.w400,
                     ),
                   ),
                 ],
               ),
             ),
+            // Radio
             _RadioCircle(isSelected: isSelected),
           ],
         ),
@@ -220,7 +242,6 @@ class _GoalOptionRow extends StatelessWidget {
 
 class _RadioCircle extends StatelessWidget {
   const _RadioCircle({required this.isSelected});
-
   final bool isSelected;
 
   @override
