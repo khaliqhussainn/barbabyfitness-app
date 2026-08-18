@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:go_router/go_router.dart';
+
+import '../../../../config/routes/route_names.dart';
 import '../../../../config/theme/app_colors.dart';
 import '../../../../shared/widgets/app_bottom_nav.dart';
 import '../providers/progress_provider.dart';
@@ -39,6 +42,8 @@ class ProgressPage extends ConsumerWidget {
                     _buildStreakCard(state),
                     SizedBox(height: 16.h),
                     _buildCoachInsightCard(state),
+                    SizedBox(height: 16.h),
+                    _buildRecapButton(context, state),
                     SizedBox(height: 28.h),
                   ],
                 ),
@@ -243,6 +248,40 @@ class ProgressPage extends ConsumerWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildRecapButton(BuildContext context, ProgressState state) {
+    final isWeekly = state.tab == ProgressTab.weekly;
+    return GestureDetector(
+      onTap: () => context.push(
+        isWeekly ? RouteNames.weeklyRecap : RouteNames.monthlyRecap,
+      ),
+      child: Container(
+        width: double.infinity,
+        height: 52.h,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(color: AppColors.primary, width: 1.5),
+        ),
+        alignment: Alignment.center,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.bar_chart_rounded, color: AppColors.primary, size: 18.w),
+            SizedBox(width: 8.w),
+            Text(
+              isWeekly ? 'View Weekly Recap' : 'View Monthly Recap',
+              style: GoogleFonts.inter(
+                color: AppColors.primary,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
