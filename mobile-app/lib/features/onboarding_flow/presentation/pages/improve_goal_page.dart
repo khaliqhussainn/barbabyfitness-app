@@ -199,9 +199,10 @@ class _GoalOptionRow extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12.r),
               ),
               alignment: Alignment.center,
-              child: Text(
-                goal.emoji,
-                style: TextStyle(fontSize: 22.sp),
+              child: Icon(
+                goal.icon,
+                color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                size: 22.w,
               ),
             ),
             SizedBox(width: 16.w),

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum ImproveGoal { energy, consistency, strength, endurance }
@@ -21,12 +22,12 @@ extension ImproveGoalX on ImproveGoal {
     }
   }
 
-  String get emoji {
+  IconData get icon {
     switch (this) {
-      case ImproveGoal.energy:      return '⚡';
-      case ImproveGoal.consistency: return '🎯';
-      case ImproveGoal.strength:    return '💪';
-      case ImproveGoal.endurance:   return '🏃';
+      case ImproveGoal.energy:      return Icons.bolt_rounded;
+      case ImproveGoal.consistency: return Icons.track_changes_rounded;
+      case ImproveGoal.strength:    return Icons.fitness_center_rounded;
+      case ImproveGoal.endurance:   return Icons.directions_run_rounded;
     }
   }
 }
