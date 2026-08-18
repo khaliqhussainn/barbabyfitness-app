@@ -88,6 +88,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     .read(_notificationsProvider.notifier)
                     .state = !notificationsOn,
               ),
+              SizedBox(height: 8.h),
+              _buildValueRow(
+                label: 'Workout History',
+                value: 'View past workouts',
+                onTap: () => context.push(RouteNames.workoutHistory),
+              ),
               SizedBox(height: 28.h),
               _buildSectionLabel('Account'),
               SizedBox(height: 12.h),
