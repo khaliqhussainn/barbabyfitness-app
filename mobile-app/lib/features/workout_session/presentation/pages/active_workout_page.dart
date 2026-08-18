@@ -22,6 +22,9 @@ class _ActiveWorkoutPageState extends State<ActiveWorkoutPage> {
   int _selectedRpe = 1; // 0=Easy, 1=Push, 2=Hold
   int _caloriesBurned = 0;
 
+  // seconds spent at each RPE level: [easy, push, hold]
+  final List<int> _rpeSeconds = [0, 0, 0];
+
   static const _totalExercises = 10;
 
   final List<Map<String, String>> _exercises = [
@@ -46,6 +49,7 @@ class _ActiveWorkoutPageState extends State<ActiveWorkoutPage> {
       if (!_isPaused && mounted) {
         setState(() {
           _elapsedSeconds++;
+          _rpeSeconds[_selectedRpe]++;
           // ~0.75 kcal/sec rough estimate
           if (_elapsedSeconds % 2 == 0) _caloriesBurned++;
         });
@@ -423,7 +427,7 @@ class _ActiveWorkoutPageState extends State<ActiveWorkoutPage> {
               ),
               SizedBox(height: 12.h),
 
-              // ── Stats ────────────────────────────────────────
+              // ── Stats row ────────────────────────────────────
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.w),
                 child: Container(
@@ -440,15 +444,25 @@ class _ActiveWorkoutPageState extends State<ActiveWorkoutPage> {
                             label: 'Elapsed Time', value: _timerDisplay),
                         _VertDivider(),
                         _StatCell(
-                            label: 'Calories Burned',
+                            label: 'Calories',
                             value: '$_caloriesBurned',
                             unit: 'kcal'),
                         _VertDivider(),
-                        _StatCell(label: 'Heart Rate', value: '--', unit: 'BPM'),
+                        _StatCell(
+                            label: 'Complete',
+                            value: '$pct%',
+                            isHighlight: true),
                       ],
                     ),
                   ),
                 ),
+              ),
+              SizedBox(height: 10.h),
+
+              // ── RPE Time Breakdown ────────────────────────────
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: _RpeTimeBar(rpeSeconds: _rpeSeconds),
               ),
               SizedBox(height: 16.h),
             ],
@@ -460,10 +474,16 @@ class _ActiveWorkoutPageState extends State<ActiveWorkoutPage> {
 }
 
 class _StatCell extends StatelessWidget {
-  const _StatCell({required this.label, required this.value, this.unit});
+  const _StatCell({
+    required this.label,
+    required this.value,
+    this.unit,
+    this.isHighlight = false,
+  });
   final String label;
   final String value;
   final String? unit;
+  final bool isHighlight;
 
   @override
   Widget build(BuildContext context) {
@@ -486,7 +506,9 @@ class _StatCell extends StatelessWidget {
                 TextSpan(
                   text: value,
                   style: GoogleFonts.outfit(
-                    color: AppColors.textPrimary,
+                    color: isHighlight
+                        ? AppColors.primary
+                        : AppColors.textPrimary,
                     fontSize: 20.sp,
                     fontWeight: FontWeight.w700,
                   ),
@@ -502,6 +524,96 @@ class _StatCell extends StatelessWidget {
                   ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── RPE Time Breakdown bar ────────────────────────────────
+class _RpeTimeBar extends StatelessWidget {
+  const _RpeTimeBar({required this.rpeSeconds});
+  final List<int> rpeSeconds;
+
+  String _fmt(int s) {
+    final m = s ~/ 60;
+    final sec = s % 60;
+    return m > 0 ? '${m}m ${sec}s' : '${sec}s';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const labels = ['Easy', 'Push', 'Hold'];
+    const colors = [
+      Color(0xFF3B82F6), // blue
+      AppColors.primary, // orange
+      Color(0xFFEF4444), // red
+    ];
+    final total = rpeSeconds.fold(0, (a, b) => a + b);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14.r),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Time at Effort Level',
+            style: GoogleFonts.inter(
+              color: AppColors.textSecondary,
+              fontSize: 11.sp,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(height: 10.h),
+          // Segmented bar
+          ClipRRect(
+            borderRadius: BorderRadius.circular(100.r),
+            child: SizedBox(
+              height: 8.h,
+              child: Row(
+                children: List.generate(3, (i) {
+                  final fraction =
+                      total == 0 ? (i == 1 ? 1.0 : 0.0) : rpeSeconds[i] / total;
+                  return Flexible(
+                    flex: (fraction * 1000).round().clamp(1, 1000),
+                    child: Container(color: colors[i]),
+                  );
+                }),
+              ),
+            ),
+          ),
+          SizedBox(height: 10.h),
+          // Labels row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: List.generate(3, (i) {
+              return Row(
+                children: [
+                  Container(
+                    width: 8.w,
+                    height: 8.w,
+                    decoration: BoxDecoration(
+                      color: colors[i],
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  SizedBox(width: 5.w),
+                  Text(
+                    '${labels[i]}  ${_fmt(rpeSeconds[i])}',
+                    style: GoogleFonts.inter(
+                      color: AppColors.textSecondary,
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
+              );
+            }),
           ),
         ],
       ),
