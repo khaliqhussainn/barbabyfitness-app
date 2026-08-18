@@ -11,6 +11,7 @@ import '../../features/progress/presentation/pages/progress_page.dart';
 import '../../features/workout_recap/presentation/pages/daily_recap_page.dart';
 import '../../features/workout_recap/presentation/pages/weekly_recap_page.dart';
 import '../../features/workout_recap/presentation/pages/monthly_recap_page.dart';
+import '../../features/workout_recap/presentation/pages/workout_history_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/profile/presentation/pages/user_goals_page.dart';
 import '../../features/profile/presentation/pages/edit_profile_page.dart';
@@ -220,6 +221,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.monthlyRecap,
         name: RouteNames.monthlyRecapName,
         builder: (context, state) => const MonthlyRecapPage(),
+      ),
+      GoRoute(
+        path: RouteNames.workoutHistory,
+        name: RouteNames.workoutHistoryName,
+        builder: (context, state) => const WorkoutHistoryPage(),
       ),
       if (kDebugMode)
         GoRoute(

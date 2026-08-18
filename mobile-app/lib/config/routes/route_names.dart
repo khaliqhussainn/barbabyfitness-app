@@ -103,4 +103,7 @@ abstract final class RouteNames {
 
   static const String monthlyRecap = '/monthly-recap';
   static const String monthlyRecapName = 'monthly-recap';
+
+  static const String workoutHistory = '/workout-history';
+  static const String workoutHistoryName = 'workout-history';
 }

@@ -59,24 +59,56 @@ class ProgressPage extends ConsumerWidget {
   Widget _buildHeader(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 25.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            'Progress',
-            style: GoogleFonts.outfit(
-              color: AppColors.textPrimary,
-              fontSize: 34.sp,
-              fontWeight: FontWeight.w800,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Progress',
+                  style: GoogleFonts.outfit(
+                    color: AppColors.textPrimary,
+                    fontSize: 34.sp,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  'Track your fitness journey',
+                  style: GoogleFonts.inter(
+                    color: AppColors.textSecondary,
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
             ),
           ),
-          SizedBox(height: 4.h),
-          Text(
-            'Track your fitness journey',
-            style: GoogleFonts.inter(
-              color: AppColors.textSecondary,
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w400,
+          GestureDetector(
+            onTap: () => context.push(RouteNames.workoutHistory),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.history_rounded,
+                      color: AppColors.textPrimary, size: 16.w),
+                  SizedBox(width: 6.w),
+                  Text(
+                    'History',
+                    style: GoogleFonts.inter(
+                      color: AppColors.textPrimary,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
