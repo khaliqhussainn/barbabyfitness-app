@@ -7,8 +7,8 @@ import '../../../../config/routes/route_names.dart';
 import '../../../../config/theme/app_colors.dart';
 import '../../../../shared/widgets/app_logo.dart';
 
-class DailyRecapPage extends StatelessWidget {
-  const DailyRecapPage({super.key});
+class MonthlyRecapPage extends StatelessWidget {
+  const MonthlyRecapPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,6 @@ class DailyRecapPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Back arrow
             Align(
               alignment: Alignment.centerLeft,
               child: Padding(
@@ -54,27 +53,27 @@ class DailyRecapPage extends StatelessWidget {
                     SizedBox(height: 20.h),
                     _buildStatCards(),
                     SizedBox(height: 16.h),
-                    _buildCoachCard(),
+                    _buildWeekGrid(),
                     SizedBox(height: 16.h),
                     _buildSection(
                       icon: Icons.thumb_up_rounded,
                       label: 'What Went Well',
                       body:
-                          'You held your push pace all the way through today\'s session. No drop-offs in the final set — that\'s real progress.',
+                          'You completed 14 sessions this month — your best month yet. Consistency in the first two weeks was outstanding, and you never skipped a Monday.',
                     ),
                     SizedBox(height: 12.h),
                     _buildSection(
                       icon: Icons.local_fire_department_rounded,
                       label: 'Effort Feedback',
                       body:
-                          'You worked at a solid Zone 3 effort today. Challenging but controlled — exactly where you want to be for this type of workout.',
+                          'Average effort held at Zone 3 across the month. Week 3 dipped slightly — likely fatigue. Smart to ease off. Your body responds well to that pattern.',
                     ),
                     SizedBox(height: 12.h),
                     _buildSection(
                       icon: Icons.lightbulb_rounded,
                       label: 'Suggestion',
                       body:
-                          'Tomorrow\'s a rest day on your plan. Use it — your muscles need time to adapt. A short walk or stretch is fine if you feel restless.',
+                          'Next month, aim for 16 sessions. You\'re close to building a fully automated habit — just two extra workouts over the month will get you there.',
                     ),
                     SizedBox(height: 32.h),
                   ],
@@ -113,7 +112,7 @@ class DailyRecapPage extends StatelessWidget {
     return Column(
       children: [
         Text(
-          'Daily Recap',
+          'Monthly Recap',
           textAlign: TextAlign.center,
           style: GoogleFonts.outfit(
             color: AppColors.textPrimary,
@@ -123,7 +122,7 @@ class DailyRecapPage extends StatelessWidget {
         ),
         SizedBox(height: 6.h),
         Text(
-          'Great work today Username',
+          'Your month at a glance',
           textAlign: TextAlign.center,
           style: GoogleFonts.inter(
             color: AppColors.textSecondary,
@@ -138,12 +137,98 @@ class DailyRecapPage extends StatelessWidget {
   Widget _buildStatCards() {
     return Row(
       children: [
-        _StatCard(value: '25 Min', label: 'Duration', isOrange: false),
+        _StatCard(value: '14 / 20', label: 'Sessions', isOrange: false),
         SizedBox(width: 8.w),
-        _StatCard(value: 'Push', label: 'Avg Effort', isOrange: false),
+        _StatCard(value: '6h 10m', label: 'Total Time', isOrange: false),
         SizedBox(width: 8.w),
-        _StatCard(value: '3 Days', label: 'Streak', isOrange: true),
+        _StatCard(value: '14 Days', label: 'Best Streak', isOrange: true),
       ],
+    );
+  }
+
+  Widget _buildWeekGrid() {
+    // weeks × days — true = worked out, false = rest
+    const weeks = [
+      [true, true, false, true, true, false, false],
+      [true, false, true, true, true, false, true],
+      [false, true, false, true, false, false, false],
+      [true, true, true, false, true, false, false],
+    ];
+    const weekLabels = ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4'];
+    const dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      padding: EdgeInsets.all(16.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Day headers
+          Row(
+            children: [
+              SizedBox(width: 36.w),
+              ...List.generate(7, (i) => Expanded(
+                    child: Center(
+                      child: Text(
+                        dayLabels[i],
+                        style: GoogleFonts.inter(
+                          color: AppColors.textSecondary,
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  )),
+            ],
+          ),
+          SizedBox(height: 10.h),
+          ...List.generate(4, (w) {
+            return Padding(
+              padding: EdgeInsets.only(bottom: 8.h),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 36.w,
+                    child: Text(
+                      weekLabels[w],
+                      style: GoogleFonts.inter(
+                        color: AppColors.textSecondary,
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  ...List.generate(7, (d) {
+                    final active = weeks[w][d];
+                    return Expanded(
+                      child: Center(
+                        child: Container(
+                          width: 26.w,
+                          height: 26.w,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: active
+                                ? AppColors.primary
+                                : AppColors.primary.withValues(alpha: 0.08),
+                          ),
+                          child: active
+                              ? Icon(Icons.check_rounded,
+                                  color: Colors.white, size: 13.w)
+                              : null,
+                        ),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
     );
   }
 
@@ -179,40 +264,6 @@ class DailyRecapPage extends StatelessWidget {
           SizedBox(height: 10.h),
           Text(
             body,
-            style: GoogleFonts.inter(
-              color: AppColors.textPrimary,
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w400,
-              height: 1.6,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCoachCard() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16.r),
-      ),
-      padding: EdgeInsets.all(18.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Calm and Supportive',
-            style: GoogleFonts.inter(
-              color: AppColors.primary,
-              fontSize: 17.sp,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          SizedBox(height: 10.h),
-          Text(
-            'You held your push pace perfectly today. Your endurance is improving. Keep it up!',
             style: GoogleFonts.inter(
               color: AppColors.textPrimary,
               fontSize: 13.sp,
