@@ -97,4 +97,10 @@ abstract final class RouteNames {
 
   static const String improveGoal = '/onboarding-flow/improve-goal';
   static const String improveGoalName = 'improve-goal';
+
+  static const String weeklyRecap = '/weekly-recap';
+  static const String weeklyRecapName = 'weekly-recap';
+
+  static const String monthlyRecap = '/monthly-recap';
+  static const String monthlyRecapName = 'monthly-recap';
 }
