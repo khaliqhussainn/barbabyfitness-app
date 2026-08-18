@@ -94,4 +94,7 @@ abstract final class RouteNames {
 
   static const String todoList = '/todo-list';
   static const String todoListName = 'todo-list';
+
+  static const String improveGoal = '/onboarding-flow/improve-goal';
+  static const String improveGoalName = 'improve-goal';
 }

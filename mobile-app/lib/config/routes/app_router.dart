@@ -30,6 +30,7 @@ import '../../features/onboarding_flow/presentation/pages/calibration_active_pag
 import '../../features/onboarding_flow/presentation/pages/device_permissions_page.dart';
 import '../../features/onboarding_flow/presentation/pages/personal_details_page.dart';
 import '../../features/onboarding_flow/presentation/pages/voice_selection_page.dart';
+import '../../features/onboarding_flow/presentation/pages/improve_goal_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/signup_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
@@ -202,6 +203,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.todoList,
         name: RouteNames.todoListName,
         builder: (context, state) => const TodoListPage(),
+      ),
+      GoRoute(
+        path: RouteNames.improveGoal,
+        name: RouteNames.improveGoalName,
+        builder: (context, state) => const ImproveGoalPage(),
       ),
       if (kDebugMode)
         GoRoute(
