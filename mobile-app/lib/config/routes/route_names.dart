@@ -106,4 +106,7 @@ abstract final class RouteNames {
 
   static const String workoutHistory = '/workout-history';
   static const String workoutHistoryName = 'workout-history';
+
+  static const String resetPassword = '/reset-password';
+  static const String resetPasswordName = 'reset-password';
 }

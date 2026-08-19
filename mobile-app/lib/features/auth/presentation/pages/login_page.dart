@@ -10,6 +10,7 @@ import '../../../../shared/widgets/app_primary_button.dart';
 import '../../../../shared/widgets/auth_field.dart';
 import '../../../../shared/widgets/or_divider.dart';
 import '../../../../shared/widgets/social_login_row.dart';
+import '../../data/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -26,6 +27,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
   String? _emailError;
   String? _passwordError;
+  String? _serverError;
 
   @override
   void dispose() {
@@ -48,22 +50,29 @@ class _LoginPageState extends State<LoginPage> {
     return null;
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     final emailErr = _validateEmail(_emailController.text);
     final passErr = _validatePassword(_passwordController.text);
     setState(() {
       _emailError = emailErr;
       _passwordError = passErr;
+      _serverError = null;
     });
     if (emailErr != null || passErr != null) return;
 
     setState(() => _isLoading = true);
-    // Simulate a brief loading state before navigating
-    Future.delayed(const Duration(milliseconds: 800), () {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
+    final result = await AuthService.login(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    if (result.success) {
       context.go(RouteNames.home);
-    });
+    } else {
+      setState(() => _serverError = result.message);
+    }
   }
 
   @override
@@ -143,6 +152,10 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               SizedBox(height: 20.h),
+              if (_serverError != null) ...[
+                _buildError(_serverError!),
+                SizedBox(height: 12.h),
+              ],
               AppPrimaryButton(
                 label: _isLoading ? 'Signing In…' : 'Sign In',
                 onPressed: _isLoading ? null : _submit,

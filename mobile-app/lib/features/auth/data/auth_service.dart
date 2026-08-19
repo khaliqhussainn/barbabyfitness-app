@@ -1,0 +1,126 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+class AuthResult {
+  final bool success;
+  final String message;
+  final String? token;
+
+  const AuthResult({required this.success, required this.message, this.token});
+}
+
+class AuthService {
+  // Change this to your backend URL when deploying.
+  // For local Android emulator use http://10.0.2.2:3000
+  // For physical device use your machine's local IP, e.g. http://192.168.x.x:3000
+  static const _base = 'http://10.0.2.2:3000/api/auth';
+
+  static const _tokenKey = 'auth_token';
+
+  // ── Token helpers ─────────────────────────────────────
+
+  static Future<void> saveToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_tokenKey, token);
+  }
+
+  static Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_tokenKey);
+  }
+
+  static Future<void> clearToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_tokenKey);
+  }
+
+  static Future<bool> isLoggedIn() async {
+    final token = await getToken();
+    return token != null && token.isNotEmpty;
+  }
+
+  // ── API calls ─────────────────────────────────────────
+
+  static Future<AuthResult> register({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_base/register'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'name': name, 'email': email, 'password': password}),
+      );
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 201 && body['success'] == true) {
+        await saveToken(body['token'] as String);
+        return AuthResult(success: true, message: 'Account created', token: body['token'] as String);
+      }
+      return AuthResult(success: false, message: body['message'] as String? ?? 'Registration failed');
+    } catch (e) {
+      return AuthResult(success: false, message: 'Cannot connect to server');
+    }
+  }
+
+  static Future<AuthResult> login({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_base/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': password}),
+      );
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 200 && body['success'] == true) {
+        await saveToken(body['token'] as String);
+        return AuthResult(success: true, message: 'Logged in', token: body['token'] as String);
+      }
+      return AuthResult(success: false, message: body['message'] as String? ?? 'Login failed');
+    } catch (e) {
+      return AuthResult(success: false, message: 'Cannot connect to server');
+    }
+  }
+
+  static Future<AuthResult> forgotPassword({required String email}) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_base/forgot-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email}),
+      );
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      return AuthResult(
+        success: body['success'] == true,
+        message: body['message'] as String? ?? 'Request sent',
+      );
+    } catch (e) {
+      return AuthResult(success: false, message: 'Cannot connect to server');
+    }
+  }
+
+  static Future<AuthResult> resetPassword({
+    required String token,
+    required String password,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_base/reset-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'token': token, 'password': password}),
+      );
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      return AuthResult(
+        success: body['success'] == true,
+        message: body['message'] as String? ?? 'Password updated',
+      );
+    } catch (e) {
+      return AuthResult(success: false, message: 'Cannot connect to server');
+    }
+  }
+
+  static Future<void> logout() => clearToken();
+}

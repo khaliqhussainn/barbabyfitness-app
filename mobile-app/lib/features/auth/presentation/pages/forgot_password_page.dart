@@ -8,6 +8,7 @@ import '../../../../config/theme/app_colors.dart';
 import '../../../../shared/widgets/app_logo.dart';
 import '../../../../shared/widgets/app_primary_button.dart';
 import '../../../../shared/widgets/auth_field.dart';
+import '../../data/auth_service.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -36,18 +37,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     return null;
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     final err = _validateEmail(_emailController.text);
     setState(() => _emailError = err);
     if (err != null) return;
 
     setState(() => _isLoading = true);
-    Future.delayed(const Duration(milliseconds: 900), () {
-      if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-        _submitted = true;
-      });
+    await AuthService.forgotPassword(email: _emailController.text.trim());
+    if (!mounted) return;
+    setState(() {
+      _isLoading = false;
+      _submitted = true;
     });
   }
 
