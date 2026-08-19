@@ -10,6 +10,7 @@ import '../../../../shared/widgets/app_primary_button.dart';
 import '../../../../shared/widgets/auth_field.dart';
 import '../../../../shared/widgets/or_divider.dart';
 import '../../../../shared/widgets/social_login_row.dart';
+import '../../data/auth_service.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -77,7 +78,9 @@ class _SignupPageState extends State<SignupPage> {
     return null;
   }
 
-  void _submit() {
+  String? _serverError;
+
+  Future<void> _submit() async {
     final nameErr = _validateName(_nameController.text);
     final emailErr = _validateEmail(_emailController.text);
     final passErr = _validatePassword(_passwordController.text);
@@ -90,6 +93,7 @@ class _SignupPageState extends State<SignupPage> {
       _passwordError = passErr;
       _confirmError = confirmErr;
       _termsError = termsErr;
+      _serverError = null;
     });
 
     if (nameErr != null ||
@@ -99,11 +103,19 @@ class _SignupPageState extends State<SignupPage> {
         termsErr != null) return;
 
     setState(() => _isLoading = true);
-    Future.delayed(const Duration(milliseconds: 800), () {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
+    final result = await AuthService.register(
+      name: _nameController.text.trim(),
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    if (result.success) {
       context.go(RouteNames.coachSelection);
-    });
+    } else {
+      setState(() => _serverError = result.message);
+    }
   }
 
   @override
@@ -168,6 +180,10 @@ class _SignupPageState extends State<SignupPage> {
             _buildTermsRow(),
             if (_termsError != null) _buildError(_termsError!),
             SizedBox(height: 24.h),
+            if (_serverError != null) ...[
+              _buildError(_serverError!),
+              SizedBox(height: 12.h),
+            ],
             AppPrimaryButton(
               label: _isLoading ? 'Creating Account…' : 'Sign Up',
               onPressed: _isLoading ? null : _submit,
