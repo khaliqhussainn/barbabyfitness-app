@@ -5,12 +5,40 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../config/routes/route_names.dart';
 import '../../../../config/theme/app_colors.dart';
-import '../../domain/models/workout_model.dart';
+import '../../data/workout_api_service.dart';
+import '../../domain/models/workout_api_model.dart';
 
-class WorkoutDetailV2Page extends StatelessWidget {
+class WorkoutDetailV2Page extends StatefulWidget {
   const WorkoutDetailV2Page({super.key, required this.workout});
 
-  final WorkoutModel workout;
+  final WorkoutApiModel workout;
+
+  @override
+  State<WorkoutDetailV2Page> createState() => _WorkoutDetailV2PageState();
+}
+
+class _WorkoutDetailV2PageState extends State<WorkoutDetailV2Page> {
+  late bool _isSaved;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isSaved = widget.workout.isSaved;
+  }
+
+  Future<void> _toggleSave() async {
+    if (_saving) return;
+    setState(() => _saving = true);
+    final success = _isSaved
+        ? await WorkoutApiService.unsaveWorkout(widget.workout.id)
+        : await WorkoutApiService.saveWorkout(widget.workout.id);
+    if (!mounted) return;
+    setState(() {
+      _saving = false;
+      if (success) _isSaved = !_isSaved;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,12 +93,42 @@ class WorkoutDetailV2Page extends StatelessWidget {
               ),
             ),
             SizedBox(width: 16.w),
-            Text(
-              'Workout Details',
-              style: GoogleFonts.outfit(
-                color: AppColors.textPrimary,
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w700,
+            Expanded(
+              child: Text(
+                'Workout Details',
+                style: GoogleFonts.outfit(
+                  color: AppColors.textPrimary,
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: _toggleSave,
+              child: Container(
+                width: 40.w,
+                height: 40.w,
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: _saving
+                    ? SizedBox(
+                        width: 18.w,
+                        height: 18.w,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.primary,
+                        ),
+                      )
+                    : Icon(
+                        _isSaved
+                            ? Icons.bookmark_rounded
+                            : Icons.bookmark_border_rounded,
+                        color: _isSaved ? AppColors.primary : AppColors.textSecondary,
+                        size: 20.w,
+                      ),
               ),
             ),
           ],
@@ -84,7 +142,7 @@ class WorkoutDetailV2Page extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          workout.name,
+          widget.workout.title,
           style: GoogleFonts.outfit(
             color: AppColors.textPrimary,
             fontSize: 28.sp,
@@ -93,7 +151,7 @@ class WorkoutDetailV2Page extends StatelessWidget {
         ),
         SizedBox(height: 8.h),
         Text(
-          workout.description,
+          widget.workout.description,
           style: GoogleFonts.inter(
             color: AppColors.textSecondary,
             fontSize: 13.sp,
@@ -106,6 +164,11 @@ class WorkoutDetailV2Page extends StatelessWidget {
   }
 
   Widget _buildStatsRow() {
+    final difficulty = widget.workout.difficulty;
+    final capitalized = difficulty.isEmpty
+        ? difficulty
+        : difficulty[0].toUpperCase() + difficulty.substring(1);
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -115,14 +178,19 @@ class WorkoutDetailV2Page extends StatelessWidget {
       child: IntrinsicHeight(
         child: Row(
           children: [
-            _StatItem(label: 'Duration', value: workout.duration, unit: 'min'),
+            _StatItem(
+              label: 'Duration',
+              value: '${widget.workout.durationMinutes}',
+              unit: 'min',
+            ),
             _Divider(),
-            _StatItem(label: 'Difficulty', value: workout.difficulty, unit: ''),
+            _StatItem(label: 'Difficulty', value: capitalized, unit: ''),
             _Divider(),
             _StatItem(
-                label: 'Estimated Calories',
-                value: workout.calories,
-                unit: 'kcal'),
+              label: 'Category',
+              value: widget.workout.category ?? 'General',
+              unit: '',
+            ),
           ],
         ),
       ),
@@ -130,6 +198,23 @@ class WorkoutDetailV2Page extends StatelessWidget {
   }
 
   Widget _buildExerciseList() {
+    if (widget.workout.exercises.isEmpty) {
+      return Container(
+        padding: EdgeInsets.all(20.w),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(14.r),
+        ),
+        child: Text(
+          'No exercises listed for this workout.',
+          style: GoogleFonts.inter(
+            color: AppColors.textSecondary,
+            fontSize: 13.sp,
+          ),
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -142,7 +227,12 @@ class WorkoutDetailV2Page extends StatelessWidget {
           ),
         ),
         SizedBox(height: 12.h),
-        ...workout.exercises.map((e) => _ExerciseRow(name: e.$1, sets: e.$2)),
+        ...widget.workout.exercises.map(
+          (e) => _ExerciseRow(
+            name: e.name,
+            sets: '${e.sets} × ${e.reps}',
+          ),
+        ),
       ],
     );
   }
@@ -180,8 +270,7 @@ class WorkoutDetailV2Page extends StatelessWidget {
 }
 
 class _StatItem extends StatelessWidget {
-  const _StatItem(
-      {required this.label, required this.value, required this.unit});
+  const _StatItem({required this.label, required this.value, required this.unit});
 
   final String label;
   final String value;
