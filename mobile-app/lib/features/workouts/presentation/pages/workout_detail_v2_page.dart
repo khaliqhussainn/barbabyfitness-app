@@ -241,7 +241,7 @@ class _WorkoutDetailV2PageState extends State<WorkoutDetailV2Page> {
     return Padding(
       padding: EdgeInsets.fromLTRB(25.w, 12.h, 25.w, 32.h),
       child: GestureDetector(
-        onTap: () => context.go(RouteNames.activeWorkout),
+        onTap: () => context.go(RouteNames.activeWorkout, extra: workout.title),
         child: Container(
           height: 54.h,
           decoration: BoxDecoration(

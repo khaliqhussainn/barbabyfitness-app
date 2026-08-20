@@ -10,7 +10,8 @@ import '../../../../config/theme/app_colors.dart';
 import '../../../workouts/data/workout_api_service.dart';
 
 class ActiveWorkoutPage extends StatefulWidget {
-  const ActiveWorkoutPage({super.key});
+  const ActiveWorkoutPage({super.key, this.workoutTitle});
+  final String? workoutTitle;
 
   @override
   State<ActiveWorkoutPage> createState() => _ActiveWorkoutPageState();
@@ -85,7 +86,7 @@ class _ActiveWorkoutPageState extends State<ActiveWorkoutPage> {
         onEnd: () async {
           Navigator.pop(context);
           await WorkoutApiService.logSession(
-            workoutTitle: 'Selected Workout',
+            workoutTitle: widget.workoutTitle ?? 'Workout',
             durationSeconds: _elapsedSeconds,
             caloriesBurned: _caloriesBurned,
           );
@@ -125,7 +126,7 @@ class _ActiveWorkoutPageState extends State<ActiveWorkoutPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Selected Workout',
+                            widget.workoutTitle ?? 'Workout',
                             style: GoogleFonts.outfit(
                               color: AppColors.textPrimary,
                               fontSize: 22.sp,

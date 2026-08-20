@@ -181,7 +181,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteNames.activeWorkout,
         name: RouteNames.activeWorkoutName,
-        builder: (context, state) => const ActiveWorkoutPage(),
+        builder: (context, state) => ActiveWorkoutPage(workoutTitle: state.extra as String?),
       ),
       GoRoute(
         path: RouteNames.workoutSelectionV2,
