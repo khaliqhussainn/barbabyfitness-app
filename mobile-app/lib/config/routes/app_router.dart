@@ -23,6 +23,7 @@ import '../../features/workouts/presentation/pages/workout_selection_v2_page.dar
 import '../../features/workouts/presentation/pages/workout_detail_page.dart';
 import '../../features/workouts/presentation/pages/workout_detail_v2_page.dart';
 import '../../features/workouts/domain/models/workout_model.dart';
+import '../../features/workouts/domain/models/workout_api_model.dart';
 import '../../features/paywall/presentation/pages/paywall_page.dart';
 import '../../features/workout_recap/presentation/pages/workout_complete_page.dart';
 import '../../dev/dev_launcher_page.dart';
@@ -198,7 +199,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.workoutDetailV2,
         name: RouteNames.workoutDetailV2Name,
         builder: (context, state) => WorkoutDetailV2Page(
-          workout: state.extra as WorkoutModel,
+          workout: state.extra as WorkoutApiModel,
         ),
       ),
       GoRoute(

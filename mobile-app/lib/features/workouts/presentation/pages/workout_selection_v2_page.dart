@@ -6,55 +6,40 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../config/routes/route_names.dart';
 import '../../../../config/theme/app_colors.dart';
 import '../../../../shared/widgets/app_bottom_nav.dart';
-import '../../domain/models/workout_model.dart';
+import '../../data/workout_api_service.dart';
+import '../../domain/models/workout_api_model.dart';
 
-class WorkoutSelectionV2Page extends StatelessWidget {
+class WorkoutSelectionV2Page extends StatefulWidget {
   const WorkoutSelectionV2Page({super.key});
 
-  static final _workouts = [
-    WorkoutModel(
-      imagePath: 'assets/images/homeimg.png',
-      name: 'Full Body Strength',
-      description: 'A comprehensive routine for total body conditioning. Improve cardiovascular endurance, build explosive strength and maximum calorie burn with this high-intensity full-body workout.',
-      duration: '20',
-      difficulty: 'Intermediate',
-      calories: '320',
-      exercises: [
-        ('High Knees', '3 × 20'),
-        ('Burpees', '3 × 10'),
-        ('Jump Squats', '3 × 15'),
-        ('Plank Hold', '60 Seconds'),
-      ],
-    ),
-    WorkoutModel(
-      imagePath: 'assets/images/homeimg.png',
-      name: 'Metabolic burn HIIT',
-      description: 'Torch fat and boost endurance with short intervals. A high-energy cardio workout that spikes your metabolism and burns maximum calories in minimum time.',
-      duration: '20',
-      difficulty: 'Intermediate',
-      calories: '280',
-      exercises: [
-        ('Mountain Climbers', '3 × 20'),
-        ('Jump Lunges', '3 × 12'),
-        ('Box Jumps', '3 × 10'),
-        ('Burpees', '3 × 10'),
-      ],
-    ),
-    WorkoutModel(
-      imagePath: 'assets/images/homeimg.png',
-      name: 'Upper Body Power',
-      description: 'Build strength and definition in your upper body. Target chest, shoulders, back and arms for a complete upper-body transformation.',
-      duration: '25',
-      difficulty: 'Advanced',
-      calories: '310',
-      exercises: [
-        ('Push-Ups', '4 × 15'),
-        ('Pike Push-Ups', '3 × 12'),
-        ('Diamond Push-Ups', '3 × 10'),
-        ('Tricep Dips', '3 × 15'),
-      ],
-    ),
-  ];
+  @override
+  State<WorkoutSelectionV2Page> createState() => _WorkoutSelectionV2PageState();
+}
+
+class _WorkoutSelectionV2PageState extends State<WorkoutSelectionV2Page> {
+  List<WorkoutApiModel> _workouts = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadWorkouts();
+  }
+
+  Future<void> _loadWorkouts() async {
+    final workouts = await WorkoutApiService.listWorkouts();
+    if (!mounted) return;
+    setState(() {
+      _workouts = workouts;
+      _isLoading = false;
+    });
+  }
+
+  void _onSaveToggled(int index, bool isSaved) {
+    setState(() {
+      _workouts[index] = _workouts[index].copyWith(isSaved: isSaved);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,21 +55,7 @@ class WorkoutSelectionV2Page extends StatelessWidget {
               child: _buildHeader(),
             ),
             SizedBox(height: 24.h),
-            Expanded(
-              child: ListView.separated(
-                padding: EdgeInsets.symmetric(horizontal: 25.w)
-                    .copyWith(bottom: 24.h),
-                itemCount: _workouts.length,
-                separatorBuilder: (_, __) => SizedBox(height: 16.h),
-                itemBuilder: (context, index) => _WorkoutCard(
-                  workout: _workouts[index],
-                  onViewDetails: () => context.push(
-                    RouteNames.workoutDetail,
-                    extra: _workouts[index],
-                  ),
-                ),
-              ),
-            ),
+            Expanded(child: _buildBody()),
           ],
         ),
       ),
@@ -119,20 +90,104 @@ class WorkoutSelectionV2Page extends StatelessWidget {
       ],
     );
   }
+
+  Widget _buildBody() {
+    if (_isLoading) {
+      return Center(
+        child: CircularProgressIndicator(color: AppColors.primary),
+      );
+    }
+
+    if (_workouts.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.fitness_center_rounded,
+                color: AppColors.textSecondary.withValues(alpha: 0.4), size: 52.w),
+            SizedBox(height: 16.h),
+            Text(
+              'No workouts available',
+              style: GoogleFonts.outfit(
+                  color: AppColors.textSecondary, fontSize: 16.sp),
+            ),
+            SizedBox(height: 8.h),
+            GestureDetector(
+              onTap: () {
+                setState(() => _isLoading = true);
+                _loadWorkouts();
+              },
+              child: Text(
+                'Tap to retry',
+                style: GoogleFonts.inter(
+                    color: AppColors.primary,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      color: AppColors.primary,
+      onRefresh: _loadWorkouts,
+      child: ListView.separated(
+        padding: EdgeInsets.symmetric(horizontal: 25.w).copyWith(bottom: 24.h),
+        itemCount: _workouts.length,
+        separatorBuilder: (_, __) => SizedBox(height: 16.h),
+        itemBuilder: (context, index) => _WorkoutCard(
+          workout: _workouts[index],
+          onViewDetails: () => context.push(
+            RouteNames.workoutDetailV2,
+            extra: _workouts[index],
+          ),
+          onSaveToggled: (isSaved) => _onSaveToggled(index, isSaved),
+        ),
+      ),
+    );
+  }
 }
 
 class _WorkoutCard extends StatefulWidget {
-  const _WorkoutCard({required this.workout, required this.onViewDetails});
+  const _WorkoutCard({
+    required this.workout,
+    required this.onViewDetails,
+    required this.onSaveToggled,
+  });
 
-  final WorkoutModel workout;
+  final WorkoutApiModel workout;
   final VoidCallback onViewDetails;
+  final ValueChanged<bool> onSaveToggled;
 
   @override
   State<_WorkoutCard> createState() => _WorkoutCardState();
 }
 
 class _WorkoutCardState extends State<_WorkoutCard> {
-  bool _isSaved = false;
+  late bool _isSaved;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isSaved = widget.workout.isSaved;
+  }
+
+  Future<void> _toggleSave() async {
+    if (_saving) return;
+    setState(() => _saving = true);
+    final success = _isSaved
+        ? await WorkoutApiService.unsaveWorkout(widget.workout.id)
+        : await WorkoutApiService.saveWorkout(widget.workout.id);
+    if (!mounted) return;
+    setState(() {
+      _saving = false;
+      if (success) _isSaved = !_isSaved;
+    });
+    if (success) widget.onSaveToggled(_isSaved);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,24 +205,19 @@ class _WorkoutCardState extends State<_WorkoutCard> {
               SizedBox(
                 width: double.infinity,
                 height: 190.h,
-                child: Image.asset(
-                  widget.workout.imagePath,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    color: AppColors.background,
-                    child: Icon(
-                      Icons.fitness_center_rounded,
-                      color: AppColors.textSecondary.withValues(alpha: 0.3),
-                      size: 48.w,
-                    ),
-                  ),
-                ),
+                child: widget.workout.imageUrl != null
+                    ? Image.network(
+                        widget.workout.imageUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => _placeholder(),
+                      )
+                    : _placeholder(),
               ),
               Positioned(
                 top: 12.h,
                 right: 12.w,
                 child: GestureDetector(
-                  onTap: () => setState(() => _isSaved = !_isSaved),
+                  onTap: _toggleSave,
                   child: Container(
                     width: 36.w,
                     height: 36.w,
@@ -176,11 +226,22 @@ class _WorkoutCardState extends State<_WorkoutCard> {
                       shape: BoxShape.circle,
                     ),
                     alignment: Alignment.center,
-                    child: Icon(
-                      _isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-                      color: _isSaved ? AppColors.primary : Colors.white,
-                      size: 18.w,
-                    ),
+                    child: _saving
+                        ? SizedBox(
+                            width: 16.w,
+                            height: 16.w,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Icon(
+                            _isSaved
+                                ? Icons.bookmark_rounded
+                                : Icons.bookmark_border_rounded,
+                            color: _isSaved ? AppColors.primary : Colors.white,
+                            size: 18.w,
+                          ),
                   ),
                 ),
               ),
@@ -192,7 +253,7 @@ class _WorkoutCardState extends State<_WorkoutCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.workout.name,
+                  widget.workout.title,
                   style: GoogleFonts.outfit(
                     color: AppColors.textPrimary,
                     fontSize: 22.sp,
@@ -215,16 +276,13 @@ class _WorkoutCardState extends State<_WorkoutCard> {
                     children: [
                       _StatColumn(
                         label: 'Duration',
-                        value: widget.workout.duration,
+                        value: '${widget.workout.durationMinutes}',
                         unit: 'Minutes',
                       ),
                       _VertDivider(),
-                      _DifficultyColumn(label: widget.workout.difficulty),
+                      _DifficultyColumn(label: _capitalize(widget.workout.difficulty)),
                       _VertDivider(),
-                      _CaloriesColumn(
-                        label: 'Estimated Calories',
-                        value: widget.workout.calories,
-                      ),
+                      _CategoryColumn(label: widget.workout.category ?? 'General'),
                     ],
                   ),
                 ),
@@ -259,11 +317,26 @@ class _WorkoutCardState extends State<_WorkoutCard> {
       ),
     );
   }
+
+  Widget _placeholder() {
+    return Container(
+      color: AppColors.background,
+      child: Center(
+        child: Icon(
+          Icons.fitness_center_rounded,
+          color: AppColors.textSecondary.withValues(alpha: 0.3),
+          size: 48.w,
+        ),
+      ),
+    );
+  }
+
+  String _capitalize(String s) =>
+      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 }
 
 class _StatColumn extends StatelessWidget {
-  const _StatColumn(
-      {required this.label, required this.value, required this.unit});
+  const _StatColumn({required this.label, required this.value, required this.unit});
 
   final String label;
   final String value;
@@ -309,7 +382,7 @@ class _DifficultyColumn extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Diffculty',
+          Text('Difficulty',
               style: GoogleFonts.inter(
                   color: AppColors.textSecondary,
                   fontSize: 11.sp,
@@ -335,11 +408,10 @@ class _DifficultyColumn extends StatelessWidget {
   }
 }
 
-class _CaloriesColumn extends StatelessWidget {
-  const _CaloriesColumn({required this.label, required this.value});
+class _CategoryColumn extends StatelessWidget {
+  const _CategoryColumn({required this.label});
 
   final String label;
-  final String value;
 
   @override
   Widget build(BuildContext context) {
@@ -347,30 +419,17 @@ class _CaloriesColumn extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label,
+          Text('Category',
               style: GoogleFonts.inter(
                   color: AppColors.textSecondary,
                   fontSize: 11.sp,
                   fontWeight: FontWeight.w400)),
           SizedBox(height: 4.h),
-          Row(
-            children: [
-              Text(value,
-                  style: GoogleFonts.outfit(
-                      color: AppColors.textPrimary,
-                      fontSize: 26.sp,
-                      fontWeight: FontWeight.w700,
-                      height: 1)),
-              SizedBox(width: 4.w),
-              Icon(Icons.local_fire_department_rounded,
-                  color: AppColors.primary, size: 20.w),
-            ],
-          ),
-          Text('Kcal',
-              style: GoogleFonts.inter(
-                  color: AppColors.textSecondary,
-                  fontSize: 11.sp,
-                  fontWeight: FontWeight.w400)),
+          Text(label,
+              style: GoogleFonts.outfit(
+                  color: AppColors.textPrimary,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600)),
         ],
       ),
     );
