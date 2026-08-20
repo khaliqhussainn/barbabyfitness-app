@@ -7,6 +7,7 @@ const {
   listWorkouts, getSavedWorkouts, getWorkout,
   createWorkout, updateWorkout, deleteWorkout,
   saveWorkout, unsaveWorkout,
+  logSession, getSessionHistory,
 } = require('../controllers/workoutController');
 
 const router = Router();
@@ -17,10 +18,15 @@ const workoutValidators = [
   body('difficulty').isIn(['beginner', 'intermediate', 'advanced']).withMessage('Invalid difficulty'),
 ];
 
+// static routes first — must come before /:id
 router.get('/',           listWorkouts);
 router.get('/saved',      authenticate, getSavedWorkouts);
-router.get('/:id',        optionalAuth,  getWorkout);
+router.get('/sessions',   authenticate, getSessionHistory);
+router.post('/sessions',  authenticate, logSession);
 router.post('/',          authenticate, workoutValidators, validate, createWorkout);
+
+// dynamic /:id routes
+router.get('/:id',        optionalAuth,  getWorkout);
 router.put('/:id',        authenticate, workoutValidators, validate, updateWorkout);
 router.delete('/:id',     authenticate, deleteWorkout);
 router.post('/:id/save',  authenticate, saveWorkout);

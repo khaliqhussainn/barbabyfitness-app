@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../config/routes/route_names.dart';
 import '../../../../config/theme/app_colors.dart';
+import '../../../workouts/data/workout_api_service.dart';
 
 class ActiveWorkoutPage extends StatefulWidget {
   const ActiveWorkoutPage({super.key});
@@ -81,9 +82,14 @@ class _ActiveWorkoutPageState extends State<ActiveWorkoutPage> {
           Navigator.pop(context);
           setState(() => _isPaused = false);
         },
-        onEnd: () {
+        onEnd: () async {
           Navigator.pop(context);
-          context.go(RouteNames.workoutComplete);
+          await WorkoutApiService.logSession(
+            workoutTitle: 'Selected Workout',
+            durationSeconds: _elapsedSeconds,
+            caloriesBurned: _caloriesBurned,
+          );
+          if (mounted) context.go(RouteNames.workoutComplete);
         },
       ),
     );

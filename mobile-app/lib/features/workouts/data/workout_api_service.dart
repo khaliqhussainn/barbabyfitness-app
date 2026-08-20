@@ -163,4 +163,44 @@ class WorkoutApiService {
       return false;
     }
   }
+
+  static Future<bool> logSession({
+    int? workoutId,
+    required String workoutTitle,
+    required int durationSeconds,
+    required int caloriesBurned,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_base/sessions'),
+        headers: await _authHeaders(),
+        body: jsonEncode({
+          'workout_id': workoutId,
+          'workout_title': workoutTitle,
+          'duration_seconds': durationSeconds,
+          'calories_burned': caloriesBurned,
+        }),
+      );
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      return body['success'] == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getSessionHistory() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$_base/sessions'),
+        headers: await _authHeaders(),
+      );
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      if (body['success'] == true) {
+        return List<Map<String, dynamic>>.from(body['data'] as List);
+      }
+      return [];
+    } catch (_) {
+      return [];
+    }
+  }
 }
