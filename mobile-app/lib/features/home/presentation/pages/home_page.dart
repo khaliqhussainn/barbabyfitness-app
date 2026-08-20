@@ -7,6 +7,8 @@ import '../../../../config/routes/route_names.dart';
 import '../../../../config/theme/app_colors.dart';
 import '../../../../shared/widgets/app_bottom_nav.dart';
 import '../../../workouts/domain/models/workout_model.dart';
+import '../../../workouts/domain/models/workout_api_model.dart';
+import '../../../workouts/data/workout_api_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,6 +18,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List<WorkoutApiModel> _suggestedWorkouts = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSuggested();
+  }
+
+  Future<void> _loadSuggested() async {
+    final workouts = await WorkoutApiService.listWorkouts();
+    if (mounted) setState(() => _suggestedWorkouts = workouts.take(4).toList());
+  }
+
   final List<(String, String?)> _morningItems = [
     ('5 Min Warmup', '30 MIN'),
     ('Light Jog', '20 MIN'),
@@ -455,124 +470,25 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildSuggestedScroll() {
-    const workouts = [
-      ('Full Body Blast', 'Intermediate', '30 MIN'),
-      ('Core Crusher', 'Advanced', '30 MIN'),
-      ('Cardio Burn', 'Beginner', '30 MIN'),
-      ('Calisthenics', 'Advanced', '30 MIN'),
-    ];
-
+    if (_suggestedWorkouts.isEmpty) {
+      return SizedBox(
+        height: 166.h,
+        child: Center(
+          child: Text(
+            'Loading workouts...',
+            style: GoogleFonts.inter(color: AppColors.textSecondary, fontSize: 12.sp),
+          ),
+        ),
+      );
+    }
     return SizedBox(
       height: 166.h,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         clipBehavior: Clip.none,
-        itemCount: workouts.length,
+        itemCount: _suggestedWorkouts.length,
         separatorBuilder: (_, __) => SizedBox(width: 10.w),
-        itemBuilder: (context, index) {
-          final (name, level, duration) = workouts[index];
-          return _buildWorkoutCard(name, level, duration);
-        },
-      ),
-    );
-  }
-
-  Widget _buildWorkoutCard(String name, String level, String duration) {
-    return GestureDetector(
-      onTap: () => context.push(
-        RouteNames.workoutDetail,
-        extra: WorkoutModel(
-          name: name,
-          description: 'A great workout to improve your fitness and strength.',
-          imagePath: 'assets/images/homeimg.png',
-          duration: duration.replaceAll(' MIN', ''),
-          difficulty: level,
-          calories: '280',
-          exercises: const [
-            ('Warm Up', '5 Minutes'),
-            ('Main Set', '3 × 12'),
-            ('Cool Down', '5 Minutes'),
-          ],
-        ),
-      ),
-      child: Container(
-        width: 109.w,
-        height: 166.h,
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(8.r),
-        image: const DecorationImage(
-          image: AssetImage('assets/images/homeimg.png'),
-          fit: BoxFit.cover,
-          opacity: 0.35,
-        ),
-      ),
-      padding: EdgeInsets.all(10.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Align(
-            alignment: Alignment.topRight,
-            child: Icon(
-              Icons.bookmark_border_rounded,
-              color: AppColors.textPrimary,
-              size: 18.w,
-            ),
-          ),
-          const Spacer(),
-          Row(
-            children: [
-              Icon(Icons.access_time_rounded, color: AppColors.textSecondary, size: 10.w),
-              SizedBox(width: 3.w),
-              Text(
-                duration,
-                style: GoogleFonts.inter(
-                  color: AppColors.textSecondary,
-                  fontSize: 9.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 5.h),
-          Text(
-            name,
-            style: GoogleFonts.inter(
-              color: AppColors.textPrimary,
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          SizedBox(height: 4.h),
-          Row(
-            children: [
-              Text(
-                level,
-                style: GoogleFonts.inter(
-                  color: AppColors.primary,
-                  fontSize: 9.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              SizedBox(width: 4.w),
-              ...List.generate(
-                3,
-                (_) => Padding(
-                  padding: EdgeInsets.only(right: 2.w),
-                  child: Container(
-                    width: 4.w,
-                    height: 4.w,
-                    decoration: const BoxDecoration(
-                      color: AppColors.primary,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+        itemBuilder: (context, index) => _SuggestedWorkoutCard(workout: _suggestedWorkouts[index]),
       ),
     );
   }
@@ -1043,6 +959,95 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _SuggestedWorkoutCard extends StatefulWidget {
+  const _SuggestedWorkoutCard({required this.workout});
+  final WorkoutApiModel workout;
+
+  @override
+  State<_SuggestedWorkoutCard> createState() => _SuggestedWorkoutCardState();
+}
+
+class _SuggestedWorkoutCardState extends State<_SuggestedWorkoutCard> {
+  late bool _saved;
+
+  @override
+  void initState() {
+    super.initState();
+    _saved = widget.workout.isSaved;
+  }
+
+  Future<void> _toggleSave() async {
+    final wasSaved = _saved;
+    setState(() => _saved = !_saved);
+    final ok = wasSaved
+        ? await WorkoutApiService.unsaveWorkout(widget.workout.id)
+        : await WorkoutApiService.saveWorkout(widget.workout.id);
+    if (!ok && mounted) setState(() => _saved = wasSaved);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final w = widget.workout;
+    final duration = '${w.durationMinutes} MIN';
+    return GestureDetector(
+      onTap: () => context.push(RouteNames.workoutDetailV2, extra: w.copyWith(isSaved: _saved)),
+      child: Container(
+        width: 109.w,
+        height: 166.h,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(8.r),
+          image: const DecorationImage(
+            image: AssetImage('assets/images/homeimg.png'),
+            fit: BoxFit.cover,
+            opacity: 0.35,
+          ),
+        ),
+        padding: EdgeInsets.all(10.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Align(
+              alignment: Alignment.topRight,
+              child: GestureDetector(
+                onTap: _toggleSave,
+                child: Icon(
+                  _saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                  color: _saved ? AppColors.primary : AppColors.textPrimary,
+                  size: 18.w,
+                ),
+              ),
+            ),
+            const Spacer(),
+            Row(
+              children: [
+                Icon(Icons.access_time_rounded, color: AppColors.textSecondary, size: 10.w),
+                SizedBox(width: 3.w),
+                Text(
+                  duration,
+                  style: GoogleFonts.inter(color: AppColors.textSecondary, fontSize: 9.sp, fontWeight: FontWeight.w400),
+                ),
+              ],
+            ),
+            SizedBox(height: 5.h),
+            Text(
+              w.title,
+              style: GoogleFonts.inter(color: AppColors.textPrimary, fontSize: 12.sp, fontWeight: FontWeight.w700),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              w.difficulty,
+              style: GoogleFonts.inter(color: AppColors.primary, fontSize: 9.sp, fontWeight: FontWeight.w400),
+            ),
+          ],
+        ),
       ),
     );
   }
