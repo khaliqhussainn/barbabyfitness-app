@@ -273,7 +273,7 @@ class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
       padding: EdgeInsets.fromLTRB(25.w, 12.h, 25.w, 28.h),
       child: AppPrimaryButton(
         label: 'Start Workout',
-        onPressed: () => context.go(RouteNames.workoutDetailV2, extra: workout),
+        onPressed: () => context.go(RouteNames.activeWorkout),
       ),
     );
   }
