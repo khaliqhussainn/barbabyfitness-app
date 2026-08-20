@@ -8,7 +8,7 @@ class WorkoutApiService {
   // Windows/iOS desktop → localhost
   // Physical device    → your machine's LAN IP (run `ipconfig` on Windows)
   // TODO: replace with your server URL when deploying
-  static const _base = 'http://YOUR_LAPTOP_IP:3000/api/workouts';
+  static const _base = 'http://192.168.100.25:3000/api/workouts';
 
   static Future<Map<String, String>> _headers({bool auth = false}) async {
     final headers = <String, String>{'Content-Type': 'application/json'};

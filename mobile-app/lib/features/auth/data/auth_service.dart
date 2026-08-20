@@ -15,7 +15,7 @@ class AuthService {
   // Windows/iOS desktop → localhost
   // Physical device    → your machine's LAN IP (run `ipconfig` on Windows)
   // TODO: replace with your server URL when deploying
-  static const _base = 'http://YOUR_LAPTOP_IP:3000/api/auth';
+  static const _base = 'http://192.168.100.25:3000/api/auth';
 
   static const _tokenKey = 'auth_token';
 
