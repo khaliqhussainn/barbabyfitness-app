@@ -1,11 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../config/theme/app_colors.dart';
+import '../../../workouts/data/workout_api_service.dart';
 
-class WorkoutHistoryPage extends StatelessWidget {
+class WorkoutHistoryPage extends StatefulWidget {
   const WorkoutHistoryPage({super.key});
+
+  @override
+  State<WorkoutHistoryPage> createState() => _WorkoutHistoryPageState();
+}
+
+class _WorkoutHistoryPageState extends State<WorkoutHistoryPage> {
+  List<Map<String, dynamic>> _sessions = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHistory();
+  }
+
+  Future<void> _loadHistory() async {
+    setState(() => _isLoading = true);
+    final sessions = await WorkoutApiService.getSessionHistory();
+    if (!mounted) return;
+    setState(() {
+      _sessions = sessions;
+      _isLoading = false;
+    });
+  }
+
+  List<_WorkoutGroupData> get _grouped {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final weekStart = today.subtract(Duration(days: today.weekday - 1));
+    final lastWeekStart = weekStart.subtract(const Duration(days: 7));
+
+    final thisWeek = <Map<String, dynamic>>[];
+    final lastWeek = <Map<String, dynamic>>[];
+    final earlier = <Map<String, dynamic>>[];
+
+    for (final s in _sessions) {
+      final completedAt = DateTime.parse(s['completed_at'] as String).toLocal();
+      final day = DateTime(completedAt.year, completedAt.month, completedAt.day);
+      if (!day.isBefore(weekStart)) {
+        thisWeek.add(s);
+      } else if (!day.isBefore(lastWeekStart)) {
+        lastWeek.add(s);
+      } else {
+        earlier.add(s);
+      }
+    }
+
+    return [
+      if (thisWeek.isNotEmpty) _WorkoutGroupData(label: 'This Week', sessions: thisWeek),
+      if (lastWeek.isNotEmpty) _WorkoutGroupData(label: 'Last Week', sessions: lastWeek),
+      if (earlier.isNotEmpty) _WorkoutGroupData(label: 'Earlier', sessions: earlier),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,119 +103,74 @@ class WorkoutHistoryPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 20.h),
-            Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.symmetric(horizontal: 25.w),
-                itemCount: _mockHistory.length,
-                itemBuilder: (context, index) {
-                  final group = _mockHistory[index];
-                  return _WorkoutGroup(group: group);
-                },
-              ),
-            ),
+            Expanded(child: _buildBody()),
           ],
         ),
       ),
     );
   }
-}
 
-// ── Mock data ─────────────────────────────────────────────
+  Widget _buildBody() {
+    if (_isLoading) {
+      return Center(child: CircularProgressIndicator(color: AppColors.primary));
+    }
 
-class _WorkoutEntry {
-  const _WorkoutEntry({
-    required this.name,
-    required this.date,
-    required this.duration,
-    required this.exercises,
-    required this.intensity,
-  });
-  final String name;
-  final String date;
-  final String duration;
-  final int exercises;
-  final String intensity;
+    if (_sessions.isEmpty) {
+      return RefreshIndicator(
+        color: AppColors.primary,
+        onRefresh: _loadHistory,
+        child: ListView(
+          children: [
+            SizedBox(height: 80.h),
+            Center(
+              child: Column(
+                children: [
+                  Icon(Icons.history_rounded,
+                      color: AppColors.textSecondary.withValues(alpha: 0.4),
+                      size: 56.w),
+                  SizedBox(height: 16.h),
+                  Text(
+                    'No workouts completed yet',
+                    style: GoogleFonts.outfit(
+                      color: AppColors.textPrimary,
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 6.h),
+                  Text(
+                    'Complete a workout and it will appear here',
+                    style: GoogleFonts.inter(
+                      color: AppColors.textSecondary,
+                      fontSize: 13.sp,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final groups = _grouped;
+    return RefreshIndicator(
+      color: AppColors.primary,
+      onRefresh: _loadHistory,
+      child: ListView.builder(
+        padding: EdgeInsets.symmetric(horizontal: 25.w),
+        itemCount: groups.length,
+        itemBuilder: (context, index) => _WorkoutGroup(group: groups[index]),
+      ),
+    );
+  }
 }
 
 class _WorkoutGroupData {
-  const _WorkoutGroupData({required this.label, required this.entries});
+  const _WorkoutGroupData({required this.label, required this.sessions});
   final String label;
-  final List<_WorkoutEntry> entries;
+  final List<Map<String, dynamic>> sessions;
 }
-
-const _mockHistory = [
-  _WorkoutGroupData(label: 'This Week', entries: [
-    _WorkoutEntry(
-      name: 'Adaptive Strength Training',
-      date: 'Today',
-      duration: '45 min',
-      exercises: 12,
-      intensity: 'Push',
-    ),
-    _WorkoutEntry(
-      name: 'Upper Body Blast',
-      date: 'Yesterday',
-      duration: '32 min',
-      exercises: 9,
-      intensity: 'Base',
-    ),
-    _WorkoutEntry(
-      name: 'Core & Stability',
-      date: 'Mon',
-      duration: '28 min',
-      exercises: 8,
-      intensity: 'Base',
-    ),
-  ]),
-  _WorkoutGroupData(label: 'Last Week', entries: [
-    _WorkoutEntry(
-      name: 'Full Body Power',
-      date: 'Sun',
-      duration: '50 min',
-      exercises: 14,
-      intensity: 'All Out',
-    ),
-    _WorkoutEntry(
-      name: 'Lower Body Strength',
-      date: 'Fri',
-      duration: '38 min',
-      exercises: 10,
-      intensity: 'Push',
-    ),
-    _WorkoutEntry(
-      name: 'Cardio Endurance Run',
-      date: 'Wed',
-      duration: '30 min',
-      exercises: 5,
-      intensity: 'Base',
-    ),
-    _WorkoutEntry(
-      name: 'Mobility & Stretch',
-      date: 'Mon',
-      duration: '20 min',
-      exercises: 6,
-      intensity: 'Base',
-    ),
-  ]),
-  _WorkoutGroupData(label: 'Earlier', entries: [
-    _WorkoutEntry(
-      name: 'Adaptive Strength Training',
-      date: '4 Aug',
-      duration: '44 min',
-      exercises: 12,
-      intensity: 'Push',
-    ),
-    _WorkoutEntry(
-      name: 'Upper Body Blast',
-      date: '2 Aug',
-      duration: '31 min',
-      exercises: 9,
-      intensity: 'Base',
-    ),
-  ]),
-];
-
-// ── Widgets ───────────────────────────────────────────────
 
 class _WorkoutGroup extends StatelessWidget {
   const _WorkoutGroup({required this.group});
@@ -183,9 +193,9 @@ class _WorkoutGroup extends StatelessWidget {
             ),
           ),
         ),
-        ...group.entries.map((e) => Padding(
+        ...group.sessions.map((s) => Padding(
               padding: EdgeInsets.only(bottom: 10.h),
-              child: _WorkoutCard(entry: e),
+              child: _WorkoutCard(session: s),
             )),
         SizedBox(height: 8.h),
       ],
@@ -194,22 +204,34 @@ class _WorkoutGroup extends StatelessWidget {
 }
 
 class _WorkoutCard extends StatelessWidget {
-  const _WorkoutCard({required this.entry});
-  final _WorkoutEntry entry;
+  const _WorkoutCard({required this.session});
+  final Map<String, dynamic> session;
 
-  Color get _intensityColor {
-    switch (entry.intensity) {
-      case 'All Out':
-        return const Color(0xFFEF4444);
-      case 'Push':
-        return AppColors.primary;
-      default:
-        return const Color(0xFF3B82F6);
-    }
+  String _formatDuration(int seconds) {
+    final m = seconds ~/ 60;
+    final s = seconds % 60;
+    if (m == 0) return '${s}s';
+    if (s == 0) return '${m} min';
+    return '${m}m ${s}s';
+  }
+
+  String _formatDate(String raw) {
+    final dt = DateTime.parse(raw).toLocal();
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final day = DateTime(dt.year, dt.month, dt.day);
+    if (day == today) return 'Today';
+    if (day == today.subtract(const Duration(days: 1))) return 'Yesterday';
+    return DateFormat('d MMM').format(dt);
   }
 
   @override
   Widget build(BuildContext context) {
+    final title = session['workout_title'] as String? ?? 'Workout';
+    final duration = session['duration_seconds'] as int? ?? 0;
+    final calories = session['calories_burned'] as int? ?? 0;
+    final completedAt = session['completed_at'] as String? ?? '';
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -238,7 +260,7 @@ class _WorkoutCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  entry.name,
+                  title,
                   style: GoogleFonts.inter(
                     color: AppColors.textPrimary,
                     fontSize: 14.sp,
@@ -254,7 +276,7 @@ class _WorkoutCard extends StatelessWidget {
                         color: AppColors.textSecondary, size: 11.w),
                     SizedBox(width: 3.w),
                     Text(
-                      entry.duration,
+                      _formatDuration(duration),
                       style: GoogleFonts.inter(
                         color: AppColors.textSecondary,
                         fontSize: 11.sp,
@@ -262,11 +284,11 @@ class _WorkoutCard extends StatelessWidget {
                       ),
                     ),
                     SizedBox(width: 10.w),
-                    Icon(Icons.check_circle_outline_rounded,
-                        color: AppColors.textSecondary, size: 11.w),
+                    Icon(Icons.local_fire_department_rounded,
+                        color: AppColors.primary, size: 11.w),
                     SizedBox(width: 3.w),
                     Text(
-                      '${entry.exercises} exercises',
+                      '$calories kcal',
                       style: GoogleFonts.inter(
                         color: AppColors.textSecondary,
                         fontSize: 11.sp,
@@ -279,34 +301,13 @@ class _WorkoutCard extends StatelessWidget {
             ),
           ),
           SizedBox(width: 8.w),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
-                decoration: BoxDecoration(
-                  color: _intensityColor.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(100.r),
-                ),
-                child: Text(
-                  entry.intensity,
-                  style: GoogleFonts.inter(
-                    color: _intensityColor,
-                    fontSize: 10.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              SizedBox(height: 6.h),
-              Text(
-                entry.date,
-                style: GoogleFonts.inter(
-                  color: AppColors.textSecondary,
-                  fontSize: 11.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ],
+          Text(
+            completedAt.isNotEmpty ? _formatDate(completedAt) : '',
+            style: GoogleFonts.inter(
+              color: AppColors.textSecondary,
+              fontSize: 11.sp,
+              fontWeight: FontWeight.w400,
+            ),
           ),
         ],
       ),

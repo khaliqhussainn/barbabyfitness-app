@@ -141,8 +141,37 @@ async function unsaveWorkout(req, res) {
   }
 }
 
+async function logSession(req, res) {
+  try {
+    const { workout_id, workout_title, duration_seconds, calories_burned } = req.body;
+    await pool.query(
+      'INSERT INTO workout_sessions (user_id, workout_id, workout_title, duration_seconds, calories_burned) VALUES (?, ?, ?, ?, ?)',
+      [req.user.id, workout_id || null, workout_title || 'Workout', duration_seconds || 0, calories_burned || 0]
+    );
+    res.status(201).json({ success: true, message: 'Session logged' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+}
+
+async function getSessionHistory(req, res) {
+  try {
+    const [sessions] = await pool.query(
+      `SELECT ws.*, w.category FROM workout_sessions ws
+       LEFT JOIN workouts w ON ws.workout_id = w.id
+       WHERE ws.user_id = ?
+       ORDER BY ws.completed_at DESC`,
+      [req.user.id]
+    );
+    res.json({ success: true, data: sessions });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+}
+
 module.exports = {
   listWorkouts, getSavedWorkouts, getWorkout,
   createWorkout, updateWorkout, deleteWorkout,
   saveWorkout, unsaveWorkout,
+  logSession, getSessionHistory,
 };
