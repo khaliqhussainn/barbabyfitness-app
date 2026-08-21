@@ -173,6 +173,22 @@ class AuthService {
     }
   }
 
+  static Future<String?> uploadAvatar(String filePath) async {
+    try {
+      final token = await getToken();
+      final request = http.MultipartRequest('POST', Uri.parse('$_base/avatar'));
+      request.headers['Authorization'] = 'Bearer $token';
+      request.files.add(await http.MultipartFile.fromPath('avatar', filePath));
+      final streamed = await request.send();
+      final response = await http.Response.fromStream(streamed);
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      if (body['success'] == true) return body['avatar_url'] as String?;
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
   static Future<bool> deleteAccount() async {
     try {
       final token = await getToken();

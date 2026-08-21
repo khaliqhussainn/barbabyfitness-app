@@ -1,10 +1,33 @@
 const express = require('express');
 const { body } = require('express-validator');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const router = express.Router();
 
-const { register, login, forgotPassword, resetPassword, me, updateProfile, deleteAccount } = require('../controllers/authController');
+const { register, login, forgotPassword, resetPassword, me, updateProfile, deleteAccount, uploadAvatar } = require('../controllers/authController');
 const { validate } = require('../middleware/validate');
 const { authenticate } = require('../middleware/auth');
+
+// ── Multer setup for avatar uploads ──────────────────────
+const avatarsDir = path.join(__dirname, '..', 'uploads', 'avatars');
+if (!fs.existsSync(avatarsDir)) fs.mkdirSync(avatarsDir, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, avatarsDir),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `user_${req.user.id}_${Date.now()}${ext}`);
+  },
+});
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) cb(null, true);
+    else cb(new Error('Only image files are allowed'));
+  },
+});
 
 // POST /api/auth/register
 router.post(
@@ -61,5 +84,8 @@ router.put('/profile', authenticate, [
 
 // DELETE /api/auth/account  (protected)
 router.delete('/account', authenticate, deleteAccount);
+
+// POST /api/auth/avatar  (protected)
+router.post('/avatar', authenticate, upload.single('avatar'), uploadAvatar);
 
 module.exports = router;

@@ -126,6 +126,21 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
+  Widget _buildAvatarChild(ProfileState profile, double iconSize) {
+    const baseUrl = 'http://192.168.100.25:3000';
+    if (profile.imagePath != null) {
+      return Image.file(File(profile.imagePath!), fit: BoxFit.cover);
+    } else if (profile.avatarUrl != null) {
+      return Image.network(
+        '$baseUrl${profile.avatarUrl}',
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) =>
+            Icon(Icons.person_outline_rounded, color: AppColors.textSecondary, size: iconSize),
+      );
+    }
+    return Icon(Icons.person_outline_rounded, color: AppColors.textSecondary, size: iconSize);
+  }
+
   Widget _buildTitle() {
     return Text(
       'Profile',
@@ -148,10 +163,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             shape: BoxShape.circle,
           ),
           clipBehavior: Clip.antiAlias,
-          child: profile.imagePath != null
-              ? Image.file(File(profile.imagePath!), fit: BoxFit.cover)
-              : Icon(Icons.person_outline_rounded,
-                  color: AppColors.textSecondary, size: 32.w),
+          child: _buildAvatarChild(profile, 32.w),
         ),
         SizedBox(width: 16.w),
         Expanded(

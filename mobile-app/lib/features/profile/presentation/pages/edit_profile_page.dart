@@ -53,12 +53,12 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final picked = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 80,
-    );
-    if (picked != null) {
-      ref.read(profileProvider.notifier).setImage(picked.path);
+    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    if (picked == null) return;
+    ref.read(profileProvider.notifier).setImage(picked.path);
+    final url = await AuthService.uploadAvatar(picked.path);
+    if (url != null && mounted) {
+      ref.read(profileProvider.notifier).setAvatarUrl(url);
     }
   }
 
@@ -217,6 +217,17 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   }
 
   Widget _buildAvatar(ProfileState profile) {
+    final baseUrl = 'http://192.168.100.25:3000';
+    Widget avatarChild;
+    if (profile.imagePath != null) {
+      avatarChild = Image.file(File(profile.imagePath!), fit: BoxFit.cover);
+    } else if (profile.avatarUrl != null) {
+      avatarChild = Image.network('$baseUrl${profile.avatarUrl}', fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => Icon(Icons.person_outline_rounded, color: AppColors.textSecondary, size: 44.w));
+    } else {
+      avatarChild = Icon(Icons.person_outline_rounded, color: AppColors.textSecondary, size: 44.w);
+    }
+
     return Center(
       child: GestureDetector(
         onTap: _pickImage,
@@ -231,13 +242,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 shape: BoxShape.circle,
               ),
               clipBehavior: Clip.antiAlias,
-              child: profile.imagePath != null
-                  ? Image.file(
-                      File(profile.imagePath!),
-                      fit: BoxFit.cover,
-                    )
-                  : Icon(Icons.person_outline_rounded,
-                      color: AppColors.textSecondary, size: 44.w),
+              child: avatarChild,
             ),
             Container(
               width: 30.w,
