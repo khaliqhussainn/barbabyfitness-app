@@ -151,7 +151,7 @@ async function resetPassword(req, res) {
 async function me(req, res) {
   try {
     const [rows] = await pool.query(
-      'SELECT id, name, email, age, created_at FROM users WHERE id = ?',
+      'SELECT id, name, email, age, avatar_url, created_at FROM users WHERE id = ?',
       [req.user.id]
     );
     if (rows.length === 0) {
@@ -160,6 +160,22 @@ async function me(req, res) {
     return res.json({ success: true, data: rows[0] });
   } catch (err) {
     console.error('[me]', err);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+}
+
+// ── Upload Avatar ─────────────────────────────────────────
+
+async function uploadAvatar(req, res) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+    await pool.query('UPDATE users SET avatar_url = ?, updated_at = NOW() WHERE id = ?', [avatarUrl, req.user.id]);
+    return res.json({ success: true, avatar_url: avatarUrl });
+  } catch (err) {
+    console.error('[uploadAvatar]', err);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 }
@@ -197,7 +213,7 @@ async function updateProfile(req, res) {
     params.push(userId);
     await pool.query(`UPDATE users SET ${updates.join(', ')}, updated_at = NOW() WHERE id = ?`, params);
 
-    const [[updated]] = await pool.query('SELECT id, name, email, age, created_at FROM users WHERE id = ?', [userId]);
+    const [[updated]] = await pool.query('SELECT id, name, email, age, avatar_url, created_at FROM users WHERE id = ?', [userId]);
     return res.json({ success: true, message: 'Profile updated', data: updated });
   } catch (err) {
     if (err.code === 'ER_DUP_ENTRY') {
@@ -220,4 +236,4 @@ async function deleteAccount(req, res) {
   }
 }
 
-module.exports = { register, login, forgotPassword, resetPassword, me, updateProfile, deleteAccount };
+module.exports = { register, login, forgotPassword, resetPassword, me, updateProfile, deleteAccount, uploadAvatar };

@@ -13,6 +13,15 @@ async function migrate(req, res) {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
 
+    // Add avatar_url column to users if not present (idempotent)
+    const [[avatarCol]] = await pool.query(
+      `SELECT COUNT(*) AS cnt FROM information_schema.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'avatar_url'`
+    );
+    if (avatarCol.cnt === 0) {
+      await pool.query(`ALTER TABLE users ADD COLUMN avatar_url VARCHAR(500) DEFAULT NULL AFTER email`);
+    }
+
     // Add age column to users if not present (idempotent)
     const [[ageCol]] = await pool.query(
       `SELECT COUNT(*) AS cnt FROM information_schema.COLUMNS
