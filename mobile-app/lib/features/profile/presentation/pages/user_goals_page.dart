@@ -9,11 +9,35 @@ import '../../../../config/theme/app_colors.dart';
 import '../../../../shared/widgets/app_primary_button.dart';
 import '../providers/user_goals_provider.dart';
 
-class UserGoalsPage extends ConsumerWidget {
+class UserGoalsPage extends ConsumerStatefulWidget {
   const UserGoalsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<UserGoalsPage> createState() => _UserGoalsPageState();
+}
+
+class _UserGoalsPageState extends ConsumerState<UserGoalsPage> {
+  bool _saving = false;
+
+  Future<void> _save() async {
+    setState(() => _saving = true);
+    final ok = await ref.read(userGoalsProvider.notifier).save();
+    if (!mounted) return;
+    setState(() => _saving = false);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(
+        ok ? 'Goals saved' : 'Failed to save — check connection',
+        style: GoogleFonts.inter(color: Colors.white),
+      ),
+      backgroundColor: ok ? AppColors.primary : Colors.red,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+    ));
+    if (ok && mounted) context.pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(userGoalsProvider);
     final notifier = ref.read(userGoalsProvider.notifier);
 
@@ -49,8 +73,8 @@ class UserGoalsPage extends ConsumerWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 25.w),
               child: AppPrimaryButton(
-                label: 'Save Preferences',
-                onPressed: () => context.pop(),
+                label: _saving ? 'Saving...' : 'Save Preferences',
+                onPressed: _saving ? () {} : _save,
               ),
             ),
             SizedBox(height: 32.h),

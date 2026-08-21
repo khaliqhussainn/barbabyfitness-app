@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const router = express.Router();
 
-const { register, login, forgotPassword, resetPassword, me, updateProfile, deleteAccount, uploadAvatar } = require('../controllers/authController');
+const { register, login, forgotPassword, resetPassword, me, updateProfile, deleteAccount, uploadAvatar, getPreferences, updatePreferences } = require('../controllers/authController');
 const { validate } = require('../middleware/validate');
 const { authenticate } = require('../middleware/auth');
 
@@ -89,5 +89,11 @@ router.delete('/account', authenticate, deleteAccount);
 
 // POST /api/auth/avatar  (protected)
 router.post('/avatar', authenticate, upload.single('avatar'), uploadAvatar);
+
+// GET /api/auth/preferences  (protected)
+router.get('/preferences', authenticate, getPreferences);
+
+// PUT /api/auth/preferences  (protected)
+router.put('/preferences', authenticate, updatePreferences);
 
 module.exports = router;

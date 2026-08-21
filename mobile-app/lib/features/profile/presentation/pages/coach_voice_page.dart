@@ -9,11 +9,35 @@ import '../../../../shared/widgets/app_primary_button.dart';
 import '../../../onboarding_flow/domain/entities/voice_model.dart';
 import '../../../onboarding_flow/presentation/providers/voice_selection_provider.dart';
 
-class CoachVoicePage extends ConsumerWidget {
+class CoachVoicePage extends ConsumerStatefulWidget {
   const CoachVoicePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CoachVoicePage> createState() => _CoachVoicePageState();
+}
+
+class _CoachVoicePageState extends ConsumerState<CoachVoicePage> {
+  bool _saving = false;
+
+  Future<void> _save() async {
+    setState(() => _saving = true);
+    final ok = await ref.read(voiceSelectionProvider.notifier).save();
+    if (!mounted) return;
+    setState(() => _saving = false);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(
+        ok ? 'Coach voice updated' : 'Failed to save — check connection',
+        style: GoogleFonts.inter(color: Colors.white),
+      ),
+      backgroundColor: ok ? AppColors.primary : Colors.red,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+    ));
+    if (ok && mounted) context.pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final selectedId = ref.watch(voiceSelectionProvider);
 
     return Scaffold(
@@ -54,23 +78,8 @@ class CoachVoicePage extends ConsumerWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 25.w),
               child: AppPrimaryButton(
-                label: 'Save Voice',
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Coach voice updated',
-                        style: GoogleFonts.inter(color: Colors.white),
-                      ),
-                      backgroundColor: AppColors.primary,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                    ),
-                  );
-                  context.pop();
-                },
+                label: _saving ? 'Saving...' : 'Save Voice',
+                onPressed: _saving ? () {} : _save,
               ),
             ),
             SizedBox(height: 32.h),

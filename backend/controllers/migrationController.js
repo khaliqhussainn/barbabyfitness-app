@@ -95,6 +95,17 @@ async function migrate(req, res) {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
 
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS user_preferences (
+        user_id        INT UNSIGNED NOT NULL PRIMARY KEY,
+        coach_voice    VARCHAR(50)  NOT NULL DEFAULT 'direct',
+        fitness_goal   VARCHAR(50)  NOT NULL DEFAULT 'buildMuscle',
+        coaching_focus VARCHAR(50)  NOT NULL DEFAULT 'performance',
+        updated_at     TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        CONSTRAINT fk_up_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
     // Seed sample workouts if none exist
     const [[{ count }]] = await pool.query('SELECT COUNT(*) as count FROM workouts');
     if (count === 0) {

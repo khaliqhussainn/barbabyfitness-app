@@ -193,6 +193,45 @@ class AuthService {
     }
   }
 
+  static Future<Map<String, dynamic>?> getPreferences() async {
+    try {
+      final token = await getToken();
+      if (token == null) return null;
+      final response = await http.get(
+        Uri.parse('$_base/preferences'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      if (body['success'] == true) return body['data'] as Map<String, dynamic>;
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<bool> updatePreferences({
+    String? coachVoice,
+    String? fitnessGoal,
+    String? coachingFocus,
+  }) async {
+    try {
+      final token = await getToken();
+      final payload = <String, dynamic>{};
+      if (coachVoice != null) payload['coach_voice'] = coachVoice;
+      if (fitnessGoal != null) payload['fitness_goal'] = fitnessGoal;
+      if (coachingFocus != null) payload['coaching_focus'] = coachingFocus;
+      final response = await http.put(
+        Uri.parse('$_base/preferences'),
+        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'},
+        body: jsonEncode(payload),
+      );
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      return body['success'] == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   static Future<bool> deleteAccount() async {
     try {
       final token = await getToken();

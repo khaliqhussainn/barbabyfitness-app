@@ -236,4 +236,43 @@ async function deleteAccount(req, res) {
   }
 }
 
-module.exports = { register, login, forgotPassword, resetPassword, me, updateProfile, deleteAccount, uploadAvatar };
+// ── Get Preferences ───────────────────────────────────────
+
+async function getPreferences(req, res) {
+  try {
+    const [rows] = await pool.query(
+      'SELECT coach_voice, fitness_goal, coaching_focus FROM user_preferences WHERE user_id = ?',
+      [req.user.id]
+    );
+    if (rows.length === 0) {
+      return res.json({ success: true, data: { coach_voice: 'direct', fitness_goal: 'buildMuscle', coaching_focus: 'performance' } });
+    }
+    return res.json({ success: true, data: rows[0] });
+  } catch (err) {
+    console.error('[getPreferences]', err);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+}
+
+// ── Update Preferences ────────────────────────────────────
+
+async function updatePreferences(req, res) {
+  try {
+    const { coach_voice, fitness_goal, coaching_focus } = req.body;
+    await pool.query(
+      `INSERT INTO user_preferences (user_id, coach_voice, fitness_goal, coaching_focus)
+       VALUES (?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+         coach_voice    = COALESCE(VALUES(coach_voice), coach_voice),
+         fitness_goal   = COALESCE(VALUES(fitness_goal), fitness_goal),
+         coaching_focus = COALESCE(VALUES(coaching_focus), coaching_focus)`,
+      [req.user.id, coach_voice || 'direct', fitness_goal || 'buildMuscle', coaching_focus || 'performance']
+    );
+    return res.json({ success: true, message: 'Preferences saved' });
+  } catch (err) {
+    console.error('[updatePreferences]', err);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+}
+
+module.exports = { register, login, forgotPassword, resetPassword, me, updateProfile, deleteAccount, uploadAvatar, getPreferences, updatePreferences };
