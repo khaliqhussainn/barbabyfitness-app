@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../config/routes/route_names.dart';
 import '../../../../config/theme/app_colors.dart';
 import '../../../../shared/widgets/app_bottom_nav.dart';
+import '../../../auth/data/auth_service.dart';
 import '../../../onboarding_flow/domain/entities/voice_model.dart';
 import '../../../onboarding_flow/presentation/providers/voice_selection_provider.dart';
 import '../providers/profile_provider.dart';
@@ -77,7 +78,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               SizedBox(height: 8.h),
               _buildValueRow(
                 label: 'Main Goal',
-                value: 'Build Muscle',
+                value: 'View & Edit',
                 onTap: () => context.push(RouteNames.userGoals),
               ),
               SizedBox(height: 8.h),
@@ -534,9 +535,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             ),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              context.go(RouteNames.login);
+              await AuthService.logout();
+              if (context.mounted) context.go(RouteNames.login);
             },
             child: Text(
               'Logout',
@@ -588,9 +590,23 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             ),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              context.go(RouteNames.login);
+              final deleted = await AuthService.deleteAccount();
+              if (context.mounted) {
+                if (deleted) {
+                  context.go(RouteNames.login);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to delete account. Please try again.',
+                          style: GoogleFonts.inter(color: Colors.white)),
+                      backgroundColor: const Color(0xFFEF4444),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              }
             },
             child: Text(
               'Delete',

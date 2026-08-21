@@ -151,17 +151,73 @@ async function resetPassword(req, res) {
 async function me(req, res) {
   try {
     const [rows] = await pool.query(
-      'SELECT id, name, email, created_at FROM users WHERE id = ?',
+      'SELECT id, name, email, age, created_at FROM users WHERE id = ?',
       [req.user.id]
     );
     if (rows.length === 0) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
-    return res.json({ success: true, user: rows[0] });
+    return res.json({ success: true, data: rows[0] });
   } catch (err) {
     console.error('[me]', err);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 }
 
-module.exports = { register, login, forgotPassword, resetPassword, me };
+// ── Update Profile ────────────────────────────────────────
+
+async function updateProfile(req, res) {
+  try {
+    const { name, email, age, current_password, new_password } = req.body;
+    const userId = req.user.id;
+
+    if (new_password) {
+      const [[user]] = await pool.query('SELECT password_hash FROM users WHERE id = ?', [userId]);
+      const valid = await bcrypt.compare(current_password || '', user.password_hash);
+      if (!valid) {
+        return res.status(400).json({ success: false, message: 'Current password is incorrect' });
+      }
+    }
+
+    const updates = [];
+    const params = [];
+    if (name !== undefined)  { updates.push('name = ?');  params.push(name); }
+    if (email !== undefined) { updates.push('email = ?'); params.push(email); }
+    if (age !== undefined)   { updates.push('age = ?');   params.push(age !== null && age !== '' ? parseInt(age, 10) : null); }
+    if (new_password) {
+      const hash = await bcrypt.hash(new_password, 12);
+      updates.push('password_hash = ?');
+      params.push(hash);
+    }
+
+    if (updates.length === 0) {
+      return res.json({ success: true, message: 'Nothing to update' });
+    }
+
+    params.push(userId);
+    await pool.query(`UPDATE users SET ${updates.join(', ')}, updated_at = NOW() WHERE id = ?`, params);
+
+    const [[updated]] = await pool.query('SELECT id, name, email, age, created_at FROM users WHERE id = ?', [userId]);
+    return res.json({ success: true, message: 'Profile updated', data: updated });
+  } catch (err) {
+    if (err.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ success: false, message: 'Email already in use' });
+    }
+    console.error('[updateProfile]', err);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+}
+
+// ── Delete Account ────────────────────────────────────────
+
+async function deleteAccount(req, res) {
+  try {
+    await pool.query('DELETE FROM users WHERE id = ?', [req.user.id]);
+    return res.json({ success: true, message: 'Account deleted' });
+  } catch (err) {
+    console.error('[deleteAccount]', err);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+}
+
+module.exports = { register, login, forgotPassword, resetPassword, me, updateProfile, deleteAccount };
