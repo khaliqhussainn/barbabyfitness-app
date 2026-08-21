@@ -56,9 +56,30 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
     if (picked == null) return;
     ref.read(profileProvider.notifier).setImage(picked.path);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Uploading photo...', style: GoogleFonts.inter(color: Colors.white)),
+      backgroundColor: AppColors.surface,
+      behavior: SnackBarBehavior.floating,
+      duration: const Duration(seconds: 10),
+    ));
     final url = await AuthService.uploadAvatar(picked.path);
-    if (url != null && mounted) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    if (url != null) {
       ref.read(profileProvider.notifier).setAvatarUrl(url);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Photo uploaded successfully', style: GoogleFonts.inter(color: Colors.white)),
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+      ));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Photo upload failed — check server connection', style: GoogleFonts.inter(color: Colors.white)),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ));
     }
   }
 

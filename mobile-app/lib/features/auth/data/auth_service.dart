@@ -181,10 +181,14 @@ class AuthService {
       request.files.add(await http.MultipartFile.fromPath('avatar', filePath));
       final streamed = await request.send();
       final response = await http.Response.fromStream(streamed);
+      // ignore: avoid_print
+      print('[uploadAvatar] status=${response.statusCode} body=${response.body}');
       final body = jsonDecode(response.body) as Map<String, dynamic>;
       if (body['success'] == true) return body['avatar_url'] as String?;
       return null;
-    } catch (_) {
+    } catch (e) {
+      // ignore: avoid_print
+      print('[uploadAvatar] error: $e');
       return null;
     }
   }
