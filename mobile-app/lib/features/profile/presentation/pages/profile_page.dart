@@ -29,6 +29,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   bool _smartWatchConnected = false;
 
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => ref.read(profileProvider.notifier).refresh());
+  }
+
+  @override
   Widget build(BuildContext context) {
     final notificationsOn = ref.watch(_notificationsProvider);
     final profile = ref.watch(profileProvider);
