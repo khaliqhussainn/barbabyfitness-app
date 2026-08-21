@@ -124,4 +124,70 @@ class AuthService {
   }
 
   static Future<void> logout() => clearToken();
+
+  // ── Profile API ───────────────────────────────────────────
+
+  static Future<Map<String, dynamic>?> me() async {
+    try {
+      final token = await getToken();
+      if (token == null) return null;
+      final response = await http.get(
+        Uri.parse('$_base/me'),
+        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+      );
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      if (body['success'] == true) return body['data'] as Map<String, dynamic>;
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<AuthResult> updateProfile({
+    String? name,
+    String? email,
+    String? age,
+    String? currentPassword,
+    String? newPassword,
+  }) async {
+    try {
+      final token = await getToken();
+      final payload = <String, dynamic>{};
+      if (name != null) payload['name'] = name;
+      if (email != null) payload['email'] = email;
+      if (age != null) payload['age'] = age.isEmpty ? null : int.tryParse(age);
+      if (currentPassword != null) payload['current_password'] = currentPassword;
+      if (newPassword != null) payload['new_password'] = newPassword;
+      final response = await http.put(
+        Uri.parse('$_base/profile'),
+        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'},
+        body: jsonEncode(payload),
+      );
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      return AuthResult(
+        success: body['success'] == true,
+        message: body['message'] as String? ?? '',
+      );
+    } catch (_) {
+      return const AuthResult(success: false, message: 'Cannot connect to server');
+    }
+  }
+
+  static Future<bool> deleteAccount() async {
+    try {
+      final token = await getToken();
+      final response = await http.delete(
+        Uri.parse('$_base/account'),
+        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'},
+      );
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      if (body['success'] == true) {
+        await clearToken();
+        return true;
+      }
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
 }

@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../../config/theme/app_colors.dart';
 import '../../../../shared/widgets/app_primary_button.dart';
+import '../../../auth/data/auth_service.dart';
 import '../providers/profile_provider.dart';
 
 class EditProfilePage extends ConsumerStatefulWidget {
@@ -22,10 +23,13 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   late TextEditingController _usernameController;
   late TextEditingController _emailController;
   late TextEditingController _ageController;
+  final _currentPasswordController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  bool _obscureCurrent = true;
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
+  bool _saving = false;
 
   @override
   void initState() {
@@ -41,6 +45,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     _usernameController.dispose();
     _emailController.dispose();
     _ageController.dispose();
+    _currentPasswordController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -57,26 +62,47 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     }
   }
 
-  void _save() {
-    ref.read(profileProvider.notifier).update(
-          username: _usernameController.text.trim(),
-          email: _emailController.text.trim(),
-          age: _ageController.text.trim(),
-        );
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Profile updated successfully',
-          style: GoogleFonts.inter(color: Colors.white),
-        ),
+  Future<void> _save() async {
+    final newPass = _passwordController.text.trim();
+    final confirmPass = _confirmPasswordController.text.trim();
+    if (newPass.isNotEmpty && newPass != confirmPass) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Passwords do not match', style: GoogleFonts.inter(color: Colors.white)),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ));
+      return;
+    }
+    setState(() => _saving = true);
+    final result = await AuthService.updateProfile(
+      name: _usernameController.text.trim(),
+      email: _emailController.text.trim(),
+      age: _ageController.text.trim(),
+      currentPassword: newPass.isNotEmpty ? _currentPasswordController.text.trim() : null,
+      newPassword: newPass.isNotEmpty ? newPass : null,
+    );
+    if (!mounted) return;
+    setState(() => _saving = false);
+    if (result.success) {
+      ref.read(profileProvider.notifier).update(
+        username: _usernameController.text.trim(),
+        email: _emailController.text.trim(),
+        age: _ageController.text.trim(),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Profile updated successfully', style: GoogleFonts.inter(color: Colors.white)),
         backgroundColor: AppColors.primary,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-      ),
-    );
-    context.pop();
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+      ));
+      context.pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(result.message, style: GoogleFonts.inter(color: Colors.white)),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ));
+    }
   }
 
   @override
@@ -125,19 +151,24 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                     _buildSectionLabel('Change Password'),
                     SizedBox(height: 14.h),
                     _buildPasswordField(
-                      label: 'New Password',
-                      controller: _passwordController,
-                      obscure: _obscurePassword,
-                      onToggle: () => setState(
-                          () => _obscurePassword = !_obscurePassword),
+                      label: 'Current Password',
+                      controller: _currentPasswordController,
+                      obscure: _obscureCurrent,
+                      onToggle: () => setState(() => _obscureCurrent = !_obscureCurrent),
                     ),
                     SizedBox(height: 12.h),
                     _buildPasswordField(
-                      label: 'Confirm Password',
+                      label: 'New Password',
+                      controller: _passwordController,
+                      obscure: _obscurePassword,
+                      onToggle: () => setState(() => _obscurePassword = !_obscurePassword),
+                    ),
+                    SizedBox(height: 12.h),
+                    _buildPasswordField(
+                      label: 'Confirm New Password',
                       controller: _confirmPasswordController,
                       obscure: _obscureConfirm,
-                      onToggle: () =>
-                          setState(() => _obscureConfirm = !_obscureConfirm),
+                      onToggle: () => setState(() => _obscureConfirm = !_obscureConfirm),
                     ),
                     SizedBox(height: 36.h),
                   ],
@@ -147,8 +178,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 25.w),
               child: AppPrimaryButton(
-                label: 'Save Changes',
-                onPressed: _save,
+                label: _saving ? 'Saving...' : 'Save Changes',
+                onPressed: _saving ? () {} : _save,
               ),
             ),
             SizedBox(height: 32.h),

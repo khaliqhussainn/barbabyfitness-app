@@ -13,6 +13,15 @@ async function migrate(req, res) {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
 
+    // Add age column to users if not present (idempotent)
+    const [[ageCol]] = await pool.query(
+      `SELECT COUNT(*) AS cnt FROM information_schema.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'age'`
+    );
+    if (ageCol.cnt === 0) {
+      await pool.query(`ALTER TABLE users ADD COLUMN age INT UNSIGNED DEFAULT NULL AFTER email`);
+    }
+
     await pool.query(`
       CREATE TABLE IF NOT EXISTS password_reset_tokens (
         user_id    INT UNSIGNED NOT NULL,
